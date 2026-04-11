@@ -51,6 +51,14 @@ static UniformBuffer uniformData{};
 //AppInit is called at the very start of program execution
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 {
+	std::cout << sizeof(Uint32) << " uint32\n";
+	std::cout << sizeof(Uint64) << " uint64\n";
+	std::cout << sizeof(char) << " char\n";
+	std::cout << sizeof(mfg::vec3) << " vec3\n";
+	std::cout << sizeof(float) << " float\n";
+	std::cout << sizeof(int) << " int\n";
+	std::cout << sizeof(std::size_t) << " size_t\n";
+
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
@@ -117,7 +125,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	fragmentShader.Delete();
 
 
-	//Fill unchanging buffers in the program start, if data changes frequently should be done wherever it needs to be changed (eg. Iterate) 
+	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 
 	//Creating buffers
 	//Vertex Buffer
