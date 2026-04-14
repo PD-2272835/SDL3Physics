@@ -58,6 +58,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	std::cout << sizeof(float) << " float\n";
 	std::cout << sizeof(int) << " int\n";
 	std::cout << sizeof(std::size_t) << " size_t\n";
+	std::cout << sizeof(bool) << "bool\n";
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 

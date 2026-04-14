@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,7 +98,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\MathsLib\CT5MathsLib;$(ProjectDir)..\..\SDL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,17 +159,17 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SDL\VisualC\SDL\SDL.vcxproj">
-      <Project>{81ce8daf-ebb2-4761-8e45-b71abcca8c68}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="shaderSource\default_frag.glsl" />
     <None Include="shaderSource\default_vert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Shader.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SDL\VisualC\SDL\SDL.vcxproj">
+      <Project>{81ce8daf-ebb2-4761-8e45-b71abcca8c68}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
