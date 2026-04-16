@@ -9,8 +9,8 @@ struct Scene
 {
 	char name[64];
 	uint64_t id_generator = 0; //used to give EntityHandles a unique signature
-	Entity* entities; //array of entities of size defined by maxEntities
-	size_t maxEntities;
+	Entity* entities = new Entity[MAX_ENTITIES]{}; //array of entities of size defined by maxEntities
+	size_t maxEntities = MAX_ENTITIES;
 	Entity zero_entity = {}; //entity to allow operations to gracefully fail
 	float gravityStrength = 9.8;
 };

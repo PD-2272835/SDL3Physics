@@ -2,7 +2,7 @@
 
 Entity* SceneManagement::CreateEntity(Scene &scene)
 {
-	Entity* newEntity;
+	Entity* newEntity = &scene.zero_entity;
 	size_t newIndex = -1;
 
 	for (size_t i = 0; i < scene.maxEntities; ++i)
@@ -19,13 +19,12 @@ Entity* SceneManagement::CreateEntity(Scene &scene)
 		return nullptr; //no available entity was found for allocation/creation return nulltptr
 	}
 
-	*newEntity = {};
 	newEntity->allocated = true;
 	newEntity->selfHandle.offset = newIndex;
 	newEntity->selfHandle.id = scene.id_generator;
 	scene.id_generator++;
 
-	return newEntity; //return neawly allocated entity
+	return newEntity; //return newly allocated entity
 }
 
 

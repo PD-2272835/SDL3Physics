@@ -23,27 +23,27 @@ typedef struct EntityHandle //if a reference to an object is stored for a long p
 // -TheStackFrame - https://www.youtube.com/watch?v=j8v9O3aFk04
 typedef struct Entity
 {	
-	char name[64];		//optional name of this enitity
+	char name[32];		//optional name of this enitity
 	
-	EntityHandle selfHandle;	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
+	EntityHandle selfHandle{};	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
 
-	mfg::vec3 position;
-	mfg::vec3 rotation; //change this to a quaternion once quaternions are done
-	mfg::vec3 scale;
+	mfg::vec3 position{};
+	mfg::vec3 rotation{}; //change this to a quaternion once quaternions are done
+	mfg::vec3 scale{};
 
-	mfg::vec3 velocity;	//physics related data
-	mfg::vec3 acceleration;
-	bool hasGravity;
-	bool hasPhysics;
-	bool hasCollision;
-	bool renderable;
+	mfg::vec3 velocity{};	//physics related data
+	mfg::vec3 acceleration{};
+	bool hasGravity = false;
+	bool hasPhysics = false;
+	bool hasCollision = false;
+	bool renderable = false;
 
 	
-	bool enabled;		//should we skip updating this object?
-	bool allocated;		//this should also skip the traversal, used to allocate new objects
+	bool enabled = false;		//should we skip updating this object?
+	bool allocated = false;		//this should also skip the traversal, used to allocate new objects
 
-	void (*Start)();
-	void (*Update)();
+	void (*Start)() = nullptr;
+	void (*Update)() = nullptr;
 };
 
 
