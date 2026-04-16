@@ -11,6 +11,7 @@
 #include <SDL3\SDL.h>
 #include <mfg.hpp>
 #include "Shader.hpp"
+#include "Entity.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -59,6 +60,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	std::cout << sizeof(int) << " int\n";
 	std::cout << sizeof(std::size_t) << " size_t\n";
 	std::cout << sizeof(bool) << "bool\n";
+	std::cout << sizeof(Entity) << "entity\n";
+	std::cout << alignof(Entity) << "\n";
+	std::cout << sizeof(EntityHandle) << "handle\n";
+	std::cout << sizeof(void*) << "voidptr\n";
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
