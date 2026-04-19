@@ -3,20 +3,23 @@
 std::shared_ptr<Asset> AssetManagement::GetAsset(const char* AssetPath)
 {
 	auto iterator = mAssets.find(AssetPath);
+	std::shared_ptr<Asset> res;
 	if (iterator != mAssets.end())
 	{
-		if (std::shared_ptr<Asset> res = iterator->second.lock())
+		if (res = iterator->second.lock())
 		{
 			return res; //Asset is already loaded
 		}
 	}
 
 	//Asset not loaded
-	AssetManagement::LoadAsset(AssetPath); //Asset not in map, create new entry
+	res = AssetManagement::LoadAsset(AssetPath); //create new entry/update Asset Entry
+	mAssets[AssetPath] = res;
+	return res;
 }
 
 //this assumes a relative filepath, and that the file actually exists
-Asset* AssetManagement::LoadAsset(const char* AssetPath)
+std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
 {
 	//get the file extension
 	std::filesystem::path p(AssetPath);

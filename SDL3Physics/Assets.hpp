@@ -53,7 +53,7 @@ class AssetManagement
 	std::map<const char*, std::weak_ptr<Asset>> mAssets; //resource management idea from "cient" on youtube: https://www.youtube.com/watch?v=qGqCE2divWU
 
 	std::shared_ptr<Asset> GetAsset(const char* AssetPath);
-	Asset* LoadAsset(const char* AssetPath);
+	std::shared_ptr<Asset> LoadAsset(const char* AssetPath);
 };
 
 #endif
