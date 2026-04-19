@@ -66,6 +66,7 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 			//do collision stuff here
 
 
+			//account for mass?
 			if (currentEntity.hasPhysics)
 			{
 				if (currentEntity.hasGravity)
@@ -85,10 +86,11 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 
 void SceneManagement::LoadSceneResources(Scene& scene)
 {
-	//TODO::resource Management
+	//TODO: resource Management
 }
 
 
+//TODO: Scene File Serialization/Deserialization
 bool SceneManagement::LoadSceneFromFile(Scene& scene)
 {
 	return false;

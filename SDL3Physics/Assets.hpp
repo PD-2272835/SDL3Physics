@@ -2,8 +2,12 @@
 #define _MESH_HPP_
 #include <vec.hpp> //Maths
 #include <vector> //std::vector
+#include <memory>
+#include <map>
+#include <filesystem>
 
 
+struct Asset {};
 
 struct Vertex
 {
@@ -21,14 +25,20 @@ enum TextureType
 	Roughness
 };
 
-struct Texture
+struct Texture : Asset
 {
 	uint32_t ID;
+	void* TexData;
 	TextureType type;
+	
+	~Texture()
+	{
+		delete[] TexData;
+	}
 };
 
 
-struct Mesh
+struct Mesh : Asset
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -38,6 +48,12 @@ struct Mesh
 };
 
 
-//could create an asset manager that uses a map of weak pointers to shared pointers to manage the lifetime of resources
+class AssetManagement
+{
+	std::map<const char*, std::weak_ptr<Asset>> mAssets; //resource management idea from "cient" on youtube: https://www.youtube.com/watch?v=qGqCE2divWU
+
+	std::shared_ptr<Asset> GetAsset(const char* AssetPath);
+	Asset* LoadAsset(const char* AssetPath);
+};
 
 #endif
