@@ -16,6 +16,13 @@ for %%I in (*_vert.glsl) do (
     @echo on
     glslc -fshader-stage=vertex %%I -o %%~nI.spv
 )
+@echo off
+echo enumerating compute shaders...
+for %%I in (*_comp.glsl) do (
+    echo %%I
+    @echo on
+    glslc -fshader-stage=compute %%I -o %%~nI.spv
+)
 
 @echo off
 echo shader enumeration and conversion done

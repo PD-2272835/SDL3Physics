@@ -188,6 +188,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	mfg::mat4* matrixData = (mfg::mat4*)SDL_MapGPUTransferBuffer(device, transferBuffer, false);
 	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f)  };
+	std::cout << mfg::MatToString(dataArray[0]) << "\n";
 
 	SDL_memcpy(matrixData, dataArray, sizeof(dataArray));
 	
