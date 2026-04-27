@@ -160,7 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="bvh.cpp" />
     <ClCompile Include="hello_triangle.cpp" />
+    <ClCompile Include="Intersections.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
@@ -170,7 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets.hpp" />
+    <ClInclude Include="bvh.hpp" />
     <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="Intersections.hpp" />
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Shader.hpp" />

@@ -25,6 +25,7 @@ namespace SceneManagement
 	Entity* EntityFromHandle(Scene &scene, const EntityHandle& handle);
 	void UpdateEntities(Scene& scene, double timeDelta);
 	
+	void InitializeScene(Scene& scene);
 
 	void LoadSceneResources(Scene &scene);
 

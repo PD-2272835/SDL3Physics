@@ -8,7 +8,7 @@ enum Kind {
 };
 
 //do not construct these unless you are absolutely sure
-typedef struct EntityHandle //if a reference to an object is stored for a long period of time, use a handle as the referenced object may be destroyed
+struct EntityHandle //if a reference to an object is stored for a long period of time, use a handle as the referenced object may be destroyed
 {
 	size_t offset; //offset into the scene's entity array
 	uint64_t id;   //unique id
