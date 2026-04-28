@@ -13,32 +13,37 @@
 struct BVHNode
 {
 	AABB box;
-	size_t objectOffset;
+	size_t object; // this value is an offset for bottom up or a morton code for top down
 	size_t parentOffset;
 	size_t left;
 	size_t right;
-	bool isLeaf;
 
-	BVHNode(AABB newBox, size_t objOffset, size_t parOffset, size_t leftOffset, size_t rightOffset, bool leaf) : box(newBox), objectOffset(objOffset), parentOffset(parOffset), left(leftOffset), right(rightOffset), isLeaf(leaf)
+	BVHNode(AABB newBox, size_t objOffset, size_t parOffset, size_t leftOffset, size_t rightOffset) : 
+			box(newBox), object(objOffset), parentOffset(parOffset), left(leftOffset), right(rightOffset)
 	{
 	};
+
+	bool isLeaf() const { return left < 0 && right < 0; } //this node is a leaf if left and right are both not set
 };
 
 uint64_t BitExpansion(uint64_t x);
 uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize);
 
+
 class bvh
 {
 	std::vector<BVHNode> nodes;
 	size_t rootNodeIndex; //index into the nodes array that contains all physics objects
+	size_t worldSize;
 
 	bvh();
-	bvh(std::vector<AABB> boxes);
+	bvh(const std::vector<AABB>& boxes, const size_t worldSize);
 
 	//slow, probably don't use
 	void BottomUpConstruction(std::vector<AABB> boxes);
 
 	void TopDownConstruction(std::vector<AABB> boxes);
+	size_t CreateTopDownSubtree(size_t begin, size_t end);
 };
 
 #endif

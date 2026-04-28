@@ -9,7 +9,7 @@ typedef struct AABB
 	mfg::vec3 lowerBound;
 	mfg::vec3 center;
 
-	AABB();
+	AABB() : upperBound(0, 0, 0), lowerBound(0, 0, 0), center(0, 0, 0) {};
 
 	AABB(mfg::vec3 max, mfg::vec3 min) : upperBound(max), lowerBound(min)
 	{

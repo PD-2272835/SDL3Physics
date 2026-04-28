@@ -5,9 +5,16 @@ bvh::bvh()
 	rootNodeIndex = 0;
 }
 
-bvh::bvh(std::vector<AABB> boxes)
+bvh::bvh(const std::vector<AABB>& boxes, const size_t worldSize = -1)
 {
-	BottomUpConstruction(boxes);
+	if (worldSize > -1)
+	{
+		TopDownConstruction(boxes);
+	}
+	else
+	{
+		BottomUpConstruction(boxes);
+	}
 }
 
 void bvh::BottomUpConstruction(std::vector<AABB> boxes)
@@ -16,7 +23,7 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 	{
 		if (nodes.size() < boxes.size())
 		{
-			nodes.emplace_back(boxes[i], i, 0, 0, 0, true);
+			nodes.emplace_back(boxes[i], i, 0, 0, 0);
 		}
 	}
 	
@@ -56,15 +63,14 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 				closestNode.parentOffset = nodesIndex;
 				
 				temp.erase(temp.begin() + i);
-				temp.erase(temp.begin() + closestNode.objectOffset);
+				temp.erase(temp.begin() + closestNode.object);
 
 				temp.emplace_back(
 					Union(working[i].box, closestNode.box),	//Bounding AABB of this object
 					nodesIndex,								//object's offset into prospective nodes array
 					0,										//offset of parent (unknown)
-					working[i].objectOffset,				//offset of left child into the nodes array
-					closestNode.objectOffset,				//offset of right child into the nodes array
-					false);
+					working[i].object,						//offset of left child into the nodes array
+					closestNode.object);					//offset of right child into the nodes array
 			}
 		}
 		nodes.insert(nodes.end(), temp.begin(), temp.end()); //add the union pairs of nodes to the tree
@@ -99,12 +105,13 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 	y = (y + worldSize / 2) / worldSize;
 	z = (z + worldSize / 2) / worldSize;
 
+	//ensure this is the case - not needed?
 	x = mfg::Clamp(x);
 	y = mfg::Clamp(y);
 	z = mfg::Clamp(z);
 
 	//create coordinates as 21 bit integer representations of each element
-	int max = 2 ^ 21; //max representable value by each coordinate in a morton code
+	const int max = 2 ^ 21; //max representable value by each coordinate in a morton code
 	auto xi = mfg::Min(static_cast<int>(std::floor(x * max)), max);
 	auto yi = mfg::Min(static_cast<int>(std::floor(y * max)), max);
 	auto zi = mfg::Min(static_cast<int>(std::floor(z * max)), max);
@@ -116,7 +123,44 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 }
 
 
+size_t bvh::CreateTopDownSubtree(size_t begin, size_t end)
+{
+	if (begin == end)
+	{
+		return begin; //return the index of this leaf
+	}
+	else {
+		size_t m = std::floor((begin + end) / 2); //find the centerpoint of the array where nodes[begin] is the start and nodes[end] is the end
+		auto left = CreateTopDownSubtree(begin, m - 1);
+		auto right = CreateTopDownSubtree(m, end);
+		nodes.emplace_back(
+			Union(nodes[left].box, nodes[right].box),
+			0,
+			0, //parent might need to be set correctly
+			left,
+			right
+		);
+	}
+}
+
 void bvh::TopDownConstruction(std::vector<AABB> boxes)
 {
+	for (size_t i = 0; i < boxes.size(); ++i)
+	{
+		nodes.emplace_back(
+			boxes[i],
+			Create3DMorton(
+				boxes[i].center.x(),
+				boxes[i].center.y(),
+				boxes[i].center.z(),
+				worldSize),
+			0, 0, 0);
+	}
+	
+	//sort the nodes array by morton code (better spacial locality/cache friendliness)
+	std::sort(nodes.begin(), nodes.end(), 
+		[](const BVHNode& a, const BVHNode& b) 
+		{return a.object < b.object; });
 
+	rootNodeIndex = CreateTopDownSubtree(0, nodes.size()); //recursively generate the tree structure and get the index of the root node
 }
