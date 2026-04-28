@@ -21,18 +21,18 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 	}
 	
 	//construct tree
-	std::vector<Node> working = nodes;
-	std::vector<Node> temp;
+	std::vector<BVHNode> working = nodes;
+	std::vector<BVHNode> temp;
 	
 	//this is ruthlessly innefficient, top down might just be the way to go
 	//for now, just perform bottom up full construction a little as possible
 	while (working.size()/2 > 1) //while there are pairs to find
 	{
 		//group AABB pairs with naive approach
-		for (size_t i = 0; i < working.size()/2 ; ++i) //we're finding pairs 
+		for (size_t i = 0; i < working.size()/2 ; ++i) //we're working with pairs
 		{
 			//this could be paralellized
-			Node closestNode = working[i]; //no default constructor, use current object so we can tell if no other closest object was found
+			BVHNode closestNode = working[i]; //no default constructor, use current object so we can tell if no other closest object was found
 			float lowestDist = FLT_MAX; //max float value
 			int offset = 0;
 			for (size_t j = 0; j < working.size(); ++j)
@@ -54,6 +54,9 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 
 				working[i].parentOffset = nodesIndex;
 				closestNode.parentOffset = nodesIndex;
+				
+				temp.erase(temp.begin() + i);
+				temp.erase(temp.begin() + closestNode.objectOffset);
 
 				temp.emplace_back(
 					Union(working[i].box, closestNode.box),	//Bounding AABB of this object
@@ -66,8 +69,54 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 		}
 		nodes.insert(nodes.end(), temp.begin(), temp.end()); //add the union pairs of nodes to the tree
 		working.insert(working.end(), temp.begin(), temp.end()); //if there's only one element left, leav
-		temp = std::vector<Node>(); //replace temp with new vector
+		temp = std::vector<BVHNode>(); //replace temp with new vector
 
 	}
-	
+}
+
+//the following Top Down BVH construction is heavily adapted from Matthias at 10-minute physics
+//https://github.com/matthias-research/pages/blob/master/tenMinutePhysics/24-morton.html#L80
+
+//expand a given coordinate so it can be used to interleave bits by "inserting" two zeros after
+//https://fgiesen.wordpress.com/2022/09/09/morton-codes-addendum/
+uint64_t BitExpansion(uint64_t x)
+{
+	x &= 0x1fffff;
+	x = (x | x << 32) & 0x1f00000000ffff;
+	x = (x | x << 16) & 0x1f0000ff0000ff;
+	x = (x | x << 8) & 0x100f00f00f00f00f;
+	x = (x | x << 4) & 0x10c30c30c30c30c3;
+	x = (x | x << 2) & 0x1249249249249249;
+	return x;
+}
+
+
+
+uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
+{
+	//normalize these coords to be in range 0-1
+	x = (x + worldSize / 2) / worldSize;
+	y = (y + worldSize / 2) / worldSize;
+	z = (z + worldSize / 2) / worldSize;
+
+	x = mfg::Clamp(x);
+	y = mfg::Clamp(y);
+	z = mfg::Clamp(z);
+
+	//create coordinates as 21 bit integer representations of each element
+	int max = 2 ^ 21; //max representable value by each coordinate in a morton code
+	auto xi = mfg::Min(static_cast<int>(std::floor(x * max)), max);
+	auto yi = mfg::Min(static_cast<int>(std::floor(y * max)), max);
+	auto zi = mfg::Min(static_cast<int>(std::floor(z * max)), max);
+
+	//expand the bitpattern of each element and pack them into a morton code
+	uint64_t morton = BitExpansion(xi) | (BitExpansion(yi) << 1) | (BitExpansion(zi) << 2);
+
+	return morton;
+}
+
+
+void bvh::TopDownConstruction(std::vector<AABB> boxes)
+{
+
 }
