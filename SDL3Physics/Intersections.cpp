@@ -27,7 +27,7 @@ bool Intersects(const AABB& a, const AABB& b)
 }
 
 //Intersection test between a point and an AABB
-bool Intersects(const mfg::vec3& point, const AABB box)
+bool Intersects(const mfg::vec3& point, const AABB& box)
 {
 	return (
 		point.x() >= box.lowerBound.x() &&
@@ -52,3 +52,14 @@ bool Intersects(const Sphere& a, const Sphere& b)
 	return (dist < a.radius + b.radius);
 }
 
+//Intersection test between a box and a sphere (depends on sphere and point test)
+bool Intersects(const AABB& box, const Sphere& sphere)
+{
+	mfg::vec3 closestPoint = mfg::vec3(
+		mfg::Max(box.lowerBound.x(), mfg::Min(sphere.pos.x(), box.upperBound.x())),
+		mfg::Max(box.lowerBound.y(), mfg::Min(sphere.pos.y(), box.upperBound.y())),
+		mfg::Max(box.lowerBound.z(), mfg::Min(sphere.pos.z(), box.upperBound.z()))
+	);
+	
+	return Intersects(closestPoint, sphere);
+}

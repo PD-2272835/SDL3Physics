@@ -1,5 +1,19 @@
 #include "Assets.hpp"
 
+AssetManagement* AssetManagement::pInstance_{ nullptr };
+std::mutex AssetManagement::mutex_;
+
+AssetManagement *AssetManagement::GetInstance()
+{
+	std::lock_guard<std::mutex>lock(mutex_);
+	if (pInstance_ == nullptr)
+	{
+		pInstance_ = new AssetManagement();
+	}
+	return pInstance_;
+}
+
+
 std::shared_ptr<Asset> AssetManagement::GetAsset(const char* AssetPath)
 {
 	auto iterator = mAssets.find(AssetPath);
