@@ -24,13 +24,19 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Assets.cpp">
+    <ClCompile Include="AssetManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bvh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Intersections.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetTypes.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetLoaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,13 +61,16 @@
     <ClInclude Include="Mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Assets.hpp">
+    <ClInclude Include="AssetManagement.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bvh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Intersections.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetLoaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

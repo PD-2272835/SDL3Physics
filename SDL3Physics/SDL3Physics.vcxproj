@@ -159,7 +159,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="AssetLoaders.cpp" />
+    <ClCompile Include="AssetManagement.cpp" />
+    <ClCompile Include="AssetTypes.hpp" />
     <ClCompile Include="bvh.cpp" />
     <ClCompile Include="hello_triangle.cpp" />
     <ClCompile Include="Intersections.cpp" />
@@ -171,7 +173,8 @@
     <None Include="shaderSource\default_vert.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Assets.hpp" />
+    <ClInclude Include="AssetLoaders.hpp" />
+    <ClInclude Include="AssetManagement.hpp" />
     <ClInclude Include="bvh.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Intersections.hpp" />

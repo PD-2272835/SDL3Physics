@@ -1,4 +1,4 @@
-#include "Assets.hpp"
+#include "AssetManagement.hpp"
 
 AssetManagement* AssetManagement::pInstance_{ nullptr };
 std::mutex AssetManagement::mutex_;
@@ -42,10 +42,11 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
 		if (p.extension() == ".img" || ".bmp" || ".png" || ".jpg")
 		{
 			//TODO: load image/texture
-			
+
 		}
 		else if (p.extension() == ".obj") {
 			//TODO: load model
+			
 
 		}
 	}
