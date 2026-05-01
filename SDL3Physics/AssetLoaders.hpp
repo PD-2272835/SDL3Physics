@@ -8,6 +8,8 @@
 
 std::string GetLineIter(const char* dataStream, const size_t& size, size_t& start);
 
+template<size_t dim> mfg::vec<dim, float> ParseObjCoord(std::string& line);
+
 Asset LoadObj(const char* path);
 Asset LoadTexture(const char* path);
 

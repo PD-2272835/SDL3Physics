@@ -46,7 +46,7 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
 		}
 		else if (p.extension() == ".obj") {
 			//TODO: load model
-			
+			LoadObj(AssetPath);
 
 		}
 	}
