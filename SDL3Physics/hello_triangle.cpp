@@ -12,6 +12,7 @@
 #include <mfg.hpp>
 #include "Shader.hpp"
 #include "Entity.hpp"
+#include "AssetLoaders.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -26,17 +27,11 @@ SDL_GPUTexture* swapchainTexture; //RenderTarget equivalent (frame buffer)
 Uint32 Width = 1280;
 Uint32 Height = 720;
 
-struct Vertex
-{
-	mfg::vec3 pos; //vec3 "position"
-	mfg::vec4 color; //vec4 "colour"
-};
-
 const static Vertex vertices[]
 {
-	{mfg::vec3(0.0f, 0.5f, 0.0f), mfg::vec4(1.0f, 0.0f, 0.0f, 1.f)},     // top vertex
-	{mfg::vec3(-0.5f, -0.5f, 0.0f), mfg::vec4(1.0f, 1.0f, 0.0f, 1.f)},   // bottom left vertex
-	{mfg::vec3(0.5f, -0.5f, 0.0f), mfg::vec4(1.0f, 0.0f, 1.0f, 1.f)}	// bottom right
+	{mfg::vec3(0.0f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 0.0f), mfg::vec2(1.0f, 1.0f)},     // top vertex
+	{mfg::vec3(-0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 1.0f, 0.0f), mfg::vec2(1.f, 0.f)},   // bottom left vertex
+	{mfg::vec3(0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)}	// bottom right
 };
 
 
@@ -67,6 +62,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
+	LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj");
+
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
 	device = SDL_CreateGPUDevice(PLATFORM_TARGET_TYPE, true, NULL);
 	SDL_ClaimWindowForGPUDevice(device, window);
@@ -81,7 +78,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	vertexBufferDescriptions[0].instance_step_rate = 0; 
 	vertexBufferDescriptions[0].pitch = sizeof(Vertex); //bytes to jump each "cycle" (stride)
 
-	SDL_GPUVertexAttribute vertexAttributes[2];
+	SDL_GPUVertexAttribute vertexAttributes[3];
 	vertexAttributes[0].buffer_slot = 0; //fetch data from the buffer at slot 0 (vertex buffer)
 	vertexAttributes[0].location = 0; //layout 0
 	vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; //vec3
@@ -89,8 +86,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	vertexAttributes[1].buffer_slot = 0; //fetch data from the buffer at slot 0 (vertex buffer)
 	vertexAttributes[1].location = 1; //layout 1
-	vertexAttributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4; //vec4
+	vertexAttributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
 	vertexAttributes[1].offset = sizeof(float) * 3; //attrib offset
+
+	vertexAttributes[2].buffer_slot = 0;
+	vertexAttributes[2].location = 2;
+	vertexAttributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+	vertexAttributes[2].offset = sizeof(float) * 3;
 
 
 	//enable color blending
@@ -113,7 +115,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	pipelineInfo.vertex_input_state.num_vertex_buffers = 1;
 	pipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDescriptions;
-	pipelineInfo.vertex_input_state.num_vertex_attributes = 2; //attribute count
+	pipelineInfo.vertex_input_state.num_vertex_attributes = 3; //attribute count
 	pipelineInfo.vertex_input_state.vertex_attributes = vertexAttributes; //we are using the layout defined in vertexAttributes
 
 	pipelineInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST; //we are drawing triangles

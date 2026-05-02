@@ -3,6 +3,7 @@
 bvh::bvh()
 {
 	rootNodeIndex = 0;
+	worldSize = -1;
 }
 
 bvh::bvh(const std::vector<AABB>& boxes, const size_t worldSize = -1)

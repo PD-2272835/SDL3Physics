@@ -1,4 +1,7 @@
 #include "AssetLoaders.hpp"
+
+#include <functions.hpp>
+#include <iostream>
  
 //line parsing, start is modified if a new line, or the end of file is reached
 std::string GetLineIter(const char* dataStream, const size_t &size, size_t &start)
@@ -8,28 +11,28 @@ std::string GetLineIter(const char* dataStream, const size_t &size, size_t &star
 	for (size_t i = start; i < size; ++i)
 	{
 		ch = dataStream[i];
-		if (dataStream[i] && ch != ('\n' || '\0')) //strtok might have been a better idea
+		if (dataStream[i] && ch != '\r') //strtok might have been a better idea
 		{
 			r.push_back(ch);
-		} 
-		else
-		{
-			start = i;
+		}
+		else {
 			break;
 		}
 	}
+	start += r.length() + 2; //FIXME sometimes /n and /r are used in different combinations based on operating system
 	return r;
 }
 
 template<size_t dim>
-mfg::vec<dim, float> ParseObjCoord(std::string line)
+mfg::vec<dim, float> ParseObjData(std::string line, char del)
 {
 	mfg::vec<dim, float> r;
-	auto pos = line.find(' ');
+	auto pos = line.find(del); //find the first delimiter
 	for (size_t i = 0; i < dim; ++i)
 	{
-		r[i] = std::stof(line.substr(line.begin(), pos));
-		line = line.erase(0, pos + 1);
+		r[i] = std::stof(line.substr(0, pos)); //convert current number from string to float
+		line = line.erase(0, pos+1); //pos + 1 to also remove the delimiter
+		pos = line.find(del); //set pos to the position of the next delimiter
 	}
 	return r;
 }
@@ -43,7 +46,7 @@ Asset LoadObj(const char* path)
 
 	if (file)
 	{
-		Model model;
+		Model* model;
 		std::string line;
 		while (startOffset < size)
 		{
@@ -56,30 +59,39 @@ Asset LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					ParseObjCoord<3>(line.substr(3, line.length()));
+					std::cout << "v " << mfg::VecToString(ParseObjData<3>(line.substr(2, line.length()), ' ')) << "\n";
+					break;
 				case 't':
 					//UV
-					ParseObjCoord<2>(line.substr(4, line.length()));
+					std::cout << "vt " << mfg::VecToString(ParseObjData<2>(line.substr(4, line.length()), ' ')) << "\n";
+					break;
 				case 'n':
 					//normal
+					//std::cout << "vn " << mfg::VecToString(ParseObjData<3>(line.substr(4, line.length()), ' ')) << "\n";
+					break;
 				default:
 					break;
 				}
+				break;
 			case 'f':
+
 				//parse faces
+				break;
 			default:
 				break;
 			}
+			//startOffset += line.length();
 		}
 		
 
 		SDL_free(file);
-		return model;
+		return *model;
 	}
 }
 
 
 Asset LoadTexture(const char* path)
 {
-
+	Asset r;
+	return r;
 }
