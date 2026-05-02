@@ -48,8 +48,11 @@ Asset LoadObj(const char* path)
 	{
 		Model* model;
 		std::string line;
+		int linenum = 0;
 		while (startOffset < size)
 		{
+			linenum++;
+			std::cout << linenum;
 			line = GetLineIter((char*)file, size, startOffset);
 			if (line.length() == 0) continue;
 			switch (line.c_str()[0])
@@ -67,15 +70,15 @@ Asset LoadObj(const char* path)
 					break;
 				case 'n':
 					//normal
-					//std::cout << "vn " << mfg::VecToString(ParseObjData<3>(line.substr(4, line.length()), ' ')) << "\n";
+					std::cout << "vn " << mfg::VecToString(ParseObjData<3>(line.substr(3, line.length()), ' ')) << "\n";
 					break;
 				default:
 					break;
 				}
 				break;
 			case 'f':
-
 				//parse faces
+				 
 				break;
 			default:
 				break;

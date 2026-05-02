@@ -162,6 +162,7 @@
     <ClCompile Include="AssetLoaders.cpp" />
     <ClCompile Include="AssetManagement.cpp" />
     <ClCompile Include="AssetTypes.hpp" />
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="bvh.cpp" />
     <ClCompile Include="hello_triangle.cpp" />
     <ClCompile Include="Intersections.cpp" />
@@ -175,6 +176,7 @@
   <ItemGroup>
     <ClInclude Include="AssetLoaders.hpp" />
     <ClInclude Include="AssetManagement.hpp" />
+    <ClInclude Include="Buffer.hpp" />
     <ClInclude Include="bvh.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Intersections.hpp" />
