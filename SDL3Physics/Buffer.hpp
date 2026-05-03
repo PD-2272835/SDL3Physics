@@ -4,19 +4,19 @@
 
 class Buffer
 {
-	SDL_GPUDevice* device;
 	SDL_GPUBufferCreateInfo Info;
+	SDL_GPUDevice* Device;
 	SDL_GPUBuffer* ID;
-	bool isTransferring;
+	SDL_GPUTransferBuffer* Transfer;
 
-	Buffer(SDL_GPUDevice device, Uint32 size, Uint8 usage);
+	Buffer(SDL_GPUDevice* device, Uint32 size, Uint8 usage);
 
-	//you must call EndTransfer() and must not deallocate the returned ptr
-	void* GetUploadHandle(Uint32 size);
-	void* GetDownloadHandle(Uint32 size);
+
+	void UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
+	//void* DownloadData(Uint32 size);
 	
-	void EndUpload(int transferBufferOffset, int targetRegionOffset);
-	void EndDownload();
+	//void Bind();
+	//void UnBind();
 };
 
 #endif
