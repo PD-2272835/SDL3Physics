@@ -32,12 +32,13 @@ std::shared_ptr<Asset> AssetManagement::GetAsset(const char* AssetPath)
 	return res;
 }
 
-//this assumes a relative filepath, and that the file actually exists
+//this assumes a relative filepath
 std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
 {
+	std::shared_ptr<Asset> ref = nullptr;
 	//get the file extension
 	std::filesystem::path p(AssetPath);
-	if (p.has_extension())
+	if (std::filesystem::exists(AssetPath) && p.has_extension())
 	{
 		if (p.extension() == ".img" || ".bmp" || ".png" || ".jpg")
 		{
@@ -45,11 +46,9 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
 
 		}
 		else if (p.extension() == ".obj") {
-			//TODO: load model
-			LoadObj(AssetPath);
-
+			ref = LoadObj(AssetPath);
 		}
 	}
 
-	return nullptr;
+	return ref;
 }

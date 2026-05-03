@@ -38,7 +38,7 @@ mfg::vec<dim, float> ParseObjData(std::string line, char del)
 }
 
 
-Asset LoadObj(const char* path)
+std::shared_ptr<Model> LoadObj(const char* path)
 {
 	size_t size;
 	size_t startOffset = 0;
@@ -46,7 +46,7 @@ Asset LoadObj(const char* path)
 
 	if (file)
 	{
-		Model* model;
+		std::shared_ptr<Model> model(new Model); //create a dynamically allocated smart ptr to the resulting model
 		std::string line;
 		int linenum = 0;
 		while (startOffset < size)
@@ -78,18 +78,19 @@ Asset LoadObj(const char* path)
 				break;
 			case 'f':
 				//parse faces
-				 
+				//std::cout << "f " << ParseObjData(line.substr(3, line.length()), ' ') << '\n';
 				break;
 			default:
 				break;
 			}
-			//startOffset += line.length();
 		}
 		
 
 		SDL_free(file);
-		return *model;
+		return model;
 	}
+
+	return nullptr;
 }
 
 

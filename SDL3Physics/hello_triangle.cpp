@@ -17,8 +17,10 @@
 
 SDL_Window* window;
 SDL_GPUDevice* device;
-SDL_GPUBuffer* vertexBuffer;
-SDL_GPUBuffer* vertexStorageBuffer;
+Buffer vertexBuffer;
+Buffer vertexStorageBuffer;
+Buffer indexBuffer;
+
 SDL_GPUTransferBuffer* transferBuffer;
 SDL_GPUGraphicsPipeline* graphicsPipeline;
 
@@ -28,11 +30,18 @@ SDL_GPUTexture* swapchainTexture; //RenderTarget equivalent (frame buffer)
 Uint32 Width = 1280;
 Uint32 Height = 720;
 
-const static Vertex vertices[]
+const static Vertex quad[]
 {
-	{mfg::vec3(0.0f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 0.0f), mfg::vec2(1.0f, 1.0f)},     // top vertex
-	{mfg::vec3(-0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 1.0f, 0.0f), mfg::vec2(1.f, 0.f)},   // bottom left vertex
-	{mfg::vec3(0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)}	// bottom right
+	{mfg::vec3(-0.5f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 0.0f), mfg::vec2(1.0f, 1.0f)},	// top left
+	{mfg::vec3(-0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 1.0f, 0.0f), mfg::vec2(1.f, 0.f)},	// bottom left
+	{mfg::vec3(0.5f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)},	// top right
+	{mfg::vec3(0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)}	// bottom righta
+};
+
+const static Uint16 quadIndices[]
+{
+	0, 1, 2,
+	2, 1, 3
 };
 
 
@@ -63,7 +72,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
-	LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj");
+	//LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj");
 
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
 	device = SDL_CreateGPUDevice(PLATFORM_TARGET_TYPE, true, NULL);
@@ -136,17 +145,17 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 
-	Buffer VertexBuffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, sizeof(vertices));
-	Buffer VertexStorageBuffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
+	vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, sizeof(quad));
+	vertexStorageBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
 	
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-	VertexBuffer.UploadData(commandBuffer, (void*)vertices, sizeof(vertices), 0);
+	vertexBuffer.UploadData(commandBuffer, (void*)quad, sizeof(quad), 0);
 
 	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f) };
-	VertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
+	vertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
-	vertexBuffer = VertexBuffer.ID;
-	vertexStorageBuffer = VertexStorageBuffer.ID;
+	indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, sizeof(quadIndices));
+	indexBuffer.UploadData(commandBuffer, (void*)quadIndices, sizeof(quadIndices), 0);
 
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
@@ -193,17 +202,24 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//bind pipeline to renderpass
 	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
 
-	//bind vertex buffer
-	SDL_GPUBufferBinding bufferBindings[1];
-	bufferBindings[0].buffer = vertexBuffer;
-	bufferBindings[0].offset = 0;
+	//bind vertex buffer - TODO: create methods for this in buffer class
+	SDL_GPUBufferBinding vertexBindings[1];
+	vertexBindings[0].buffer = vertexBuffer.ID;
+	vertexBindings[0].offset = 0;
 
-	SDL_BindGPUVertexBuffers(renderPass, 0, bufferBindings, 1);
+	SDL_GPUBufferBinding indexBindings[1];
+	indexBindings[0].buffer = indexBuffer.ID;
+	indexBindings[0].offset = 0;
+	
+
+	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
 	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer, 1); // "slot" corresponds to "binding" in the shader
 
 	//DRAW COMMAND!!
-	SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
+	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
+	SDL_DrawGPUIndexedPrimitives(renderPass, 6, 1, 0, 0, 0);
 
 	SDL_EndGPURenderPass(renderPass);
 	//Anything else we want to do goes below here
@@ -234,6 +250,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 	SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline);
 	SDL_ReleaseGPUBuffer(device, vertexBuffer);
 	SDL_ReleaseGPUBuffer(device, vertexStorageBuffer);
+	SDL_ReleaseGPUBuffer(device, indexBuffer);
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);
 }

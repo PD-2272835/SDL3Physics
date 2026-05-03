@@ -10,7 +10,7 @@ std::string GetLineIter(const char* dataStream, const size_t& size, size_t& star
 
 template<size_t dim> mfg::vec<dim, float> ParseObjData(std::string line, char del);
 
-Asset LoadObj(const char* path);
+std::shared_ptr<Model> LoadObj(const char* path);
 Asset LoadTexture(const char* path);
 
 #endif

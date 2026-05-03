@@ -8,7 +8,6 @@ public:
 	SDL_GPUBufferCreateInfo Info;
 	SDL_GPUDevice* Device;
 	SDL_GPUBuffer* ID;
-	SDL_GPUTransferBuffer* Transfer;
 
 	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
 
@@ -18,6 +17,9 @@ public:
 	
 	//void Bind();
 	//void UnBind();
+
+	
+	void Delete(); //You must not use this buffer after calling Delete()
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "Buffer.hpp"
 
 Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
-	: Device(device), Transfer(nullptr)
+	: Device(device)
 {
 	Info = {
 		usage, //buffer usage
@@ -20,15 +20,15 @@ void Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 		0 
 	};
 	
-	Transfer = SDL_CreateGPUTransferBuffer(Device, &createInfo);
-	SDL_memcpy(SDL_MapGPUTransferBuffer(Device, Transfer, false), data, dataSize); //fill data into the transfer buffer
-	SDL_UnmapGPUTransferBuffer(Device, Transfer);
+	SDL_GPUTransferBuffer* transfer = SDL_CreateGPUTransferBuffer(Device, &createInfo);
+	SDL_memcpy(SDL_MapGPUTransferBuffer(Device, transfer, false), data, dataSize); //fill data into the transfer buffer
+	SDL_UnmapGPUTransferBuffer(Device, transfer);
 
 	
 	SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmdBuffer);
 
 	//copy data from the first byte of the transfer buffer
-	SDL_GPUTransferBufferLocation location{Transfer, 0};
+	SDL_GPUTransferBufferLocation location{transfer, 0};
 
 	//Upload the full size of the transfer buffer to this buffer, 
 	//starting from the user-provided byte offset into this buffer
@@ -37,5 +37,12 @@ void Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 	SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
 	
 	SDL_EndGPUCopyPass(copyPass); //must end pass before
-	SDL_ReleaseGPUTransferBuffer(Device, Transfer);
+	SDL_ReleaseGPUTransferBuffer(Device, transfer);
+}
+
+void Buffer::Delete()
+{
+	SDL_ReleaseGPUBuffer(Device, ID);
+	Device = nullptr;
+	Info = {};
 }
