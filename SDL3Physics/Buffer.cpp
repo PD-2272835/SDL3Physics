@@ -1,6 +1,6 @@
 #include "Buffer.hpp"
 
-Buffer::Buffer(SDL_GPUDevice* device, Uint32 size, Uint8 usage) 
+Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
 	: Device(device), Transfer(nullptr)
 {
 	Info = {

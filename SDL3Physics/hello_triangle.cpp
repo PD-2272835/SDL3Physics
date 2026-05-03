@@ -11,6 +11,7 @@
 #include <SDL3\SDL.h>
 #include <mfg.hpp>
 #include "Shader.hpp"
+#include "Buffer.hpp"
 #include "Entity.hpp"
 #include "AssetLoaders.hpp"
 
@@ -126,87 +127,26 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
 
 
-
 	graphicsPipeline = SDL_CreateGPUGraphicsPipeline(device, &pipelineInfo);
 
 	vertexShader.Delete();
 	fragmentShader.Delete();
 
 
+
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 
-	//Creating buffers
-	//Vertex Buffer
-	SDL_GPUBufferCreateInfo vertexBufferInfo{}; //create generic buffer
-	vertexBufferInfo.size = sizeof(vertices); //size in bytes of each vertex - like layout
-	vertexBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX; //define buffer usage
-	vertexBuffer = SDL_CreateGPUBuffer(device, &vertexBufferInfo); //release buffer at the end of this method
-
-	//Create Transfer Buffer - used to move data betweeen CPU & GPU
-	SDL_GPUTransferBufferCreateInfo transferInfo{};
-	transferInfo.size = sizeof(vertices);
-	transferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD; //we are adding data to the GPU
-	transferBuffer = SDL_CreateGPUTransferBuffer(device, &transferInfo);
-
-
-	//fill data into the transfer buffer (setting up data for the gpu bus?)
-	Vertex* data = (Vertex*)SDL_MapGPUTransferBuffer(device, transferBuffer, false); //map the transferbuffer to a ptr. what is cycling?
-	SDL_memcpy(data, vertices, sizeof(vertices)); //fill data
-	SDL_UnmapGPUTransferBuffer(device, transferBuffer); //unmap transfer buffer ptr when no longer updating it
-
-
-	//Copy Pass
-	//transfer data from the transfer buffer to the vertex buffer
+	Buffer VertexBuffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, sizeof(vertices));
+	Buffer VertexStorageBuffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
+	
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-	SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+	VertexBuffer.UploadData(commandBuffer, (void*)vertices, sizeof(vertices), 0);
 
-	//find the data
-	SDL_GPUTransferBufferLocation location{};
-	location.transfer_buffer = transferBuffer;
-	location.offset = 0; //start copying from beginning of transfer buffer
+	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f) };
+	VertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
-	//where to upload the data
-	SDL_GPUBufferRegion region{};
-	region.buffer = vertexBuffer; //we are writing to the vertex buffer
-	region.size = sizeof(vertices); //how much data we are writing in bytes
-	region.offset = 0; //start writing from start of the vertex buffer
-
-	SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-	SDL_EndGPUCopyPass(copyPass); //must end pass before submission
-
-	//must release buffers after finishing using them
-	SDL_ReleaseGPUTransferBuffer(device, transferBuffer);
-
-
-	
-	//SSBO proof of concept
-	SDL_GPUBufferCreateInfo VertexShaderStorageBufferInfo = {};
-	VertexShaderStorageBufferInfo.usage = SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ;
-	VertexShaderStorageBufferInfo.size = sizeof(mfg::mat4);
-	vertexStorageBuffer = SDL_CreateGPUBuffer(device, &VertexShaderStorageBufferInfo);
-
-	transferInfo.size = VertexShaderStorageBufferInfo.size;
-	transferBuffer = SDL_CreateGPUTransferBuffer(device, &transferInfo);
-
-	mfg::mat4* matrixData = (mfg::mat4*)SDL_MapGPUTransferBuffer(device, transferBuffer, false);
-	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f)  };
-	std::cout << mfg::MatToString(dataArray[0]) << "\n";
-
-	SDL_memcpy(matrixData, dataArray, sizeof(dataArray));
-	
-	SDL_UnmapGPUTransferBuffer(device, transferBuffer);
-	copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-
-	location.transfer_buffer = transferBuffer;
-	region.buffer = vertexStorageBuffer;
-	region.size = sizeof(mfg::mat4);
-	SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-	SDL_EndGPUCopyPass(copyPass);
-
-	SDL_ReleaseGPUTransferBuffer(device, transferBuffer);
-
-
-
+	vertexBuffer = VertexBuffer.ID;
+	vertexStorageBuffer = VertexStorageBuffer.ID;
 
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer

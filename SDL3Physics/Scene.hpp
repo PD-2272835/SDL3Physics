@@ -5,6 +5,7 @@
 
 #define MAX_ENTITIES 1024
 
+//global scene state
 struct Scene
 {
 	char name[64];
@@ -19,15 +20,15 @@ struct Scene
 //Procedurally programmed stuffs to operate over a Scene's data
 namespace SceneManagement
 {
-	Entity* CreateEntity(Scene& scene);
-	void DestroyEntity(Scene& scene, const EntityHandle& entityHandle);
+	Entity* CreateEntity(Scene &scene);
+	void DestroyEntity(Scene &scene, const EntityHandle &entityHandle);
 
-	Entity* EntityFromHandle(Scene &scene, const EntityHandle& handle);
-	void UpdateEntities(Scene& scene, double timeDelta);
+	Entity* EntityFromHandle(Scene &scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
+	void UpdateEntities(Scene &scene, double timeDelta); //Update all entities in provided scene
 	
-	void InitializeScene(Scene& scene);
+	void InitializeScene(Scene &scene);
 
-	void LoadSceneResources(Scene &scene);
+	void LoadSceneResources(Scene &scene); //Load all required assets from a scene into assetManagement
 
 	//FIXME: better to return a dynamically allocated scene instance instead of operating on an existing scene
 	bool LoadSceneFromFile(Scene &scene);
