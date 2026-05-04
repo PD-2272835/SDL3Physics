@@ -9,12 +9,16 @@ public:
 	SDL_GPUDevice* Device;
 	SDL_GPUBuffer* ID;
 
+	Buffer() : Info({}), Device(nullptr), ID(nullptr) {};
 	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
 
 
 	void UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
-	//void* DownloadData(Uint32 size);
+	//void* DownloadData(Uint32 size); TODO
 	
+
+	//TODO: Bind and unbind - maybe make these virtual,
+	//and create specialized classes for different buffer types which override them?
 	//void Bind();
 	//void UnBind();
 

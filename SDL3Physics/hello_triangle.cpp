@@ -215,7 +215,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
 	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer, 1); // "slot" corresponds to "binding" in the shader
+	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
 
 	//DRAW COMMAND!!
 	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
@@ -248,9 +248,9 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
 	std::cout << std::endl;
 	SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline);
-	SDL_ReleaseGPUBuffer(device, vertexBuffer);
-	SDL_ReleaseGPUBuffer(device, vertexStorageBuffer);
-	SDL_ReleaseGPUBuffer(device, indexBuffer);
+	vertexBuffer.Delete();
+	vertexStorageBuffer.Delete();
+	indexBuffer.Delete();
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);
 }

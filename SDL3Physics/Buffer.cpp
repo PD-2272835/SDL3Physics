@@ -1,8 +1,8 @@
 #include "Buffer.hpp"
 
 Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
-	: Device(device)
 {
+	Device = device;
 	Info = {
 		usage, //buffer usage
 		size, //size of buffer in bytes
