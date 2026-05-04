@@ -1,7 +1,4 @@
 #include "AssetLoaders.hpp"
-
-#include <functions.hpp>
-#include <iostream>
  
 //line parsing, start is modified if a new line, or the end of file is reached
 std::string GetLineIter(const char* dataStream, const size_t &size, size_t &start)
@@ -98,17 +95,14 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					//std::cout << "v " << mfg::VecToString(ParseObjVector<3>(line.substr(2, line.length()))) << "\n";
 					positions.push_back(ParseObjVector<3>(line.substr(2, line.length())));
 					break;
 				case 't':
 					//UV
-					//std::cout << "vt " << mfg::VecToString(ParseObjVector<2>(line.substr(4, line.length()))) << "\n";
 					uvs.push_back(ParseObjVector<2>(line.substr(4, line.length())));
 					break;
 				case 'n':
 					//normal
-					//std::cout << "vn " << mfg::VecToString(ParseObjVector<3>(line.substr(3, line.length()))) << "\n";
 					normals.push_back(ParseObjVector<3>(line.substr(3, line.length())));
 					break;
 				default:
@@ -117,8 +111,6 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 				break;
 			case 'f':
 				//parse faces
-				//std::cout << "f " << ParseObjData(line.substr(3, line.length()), ' ') << '\n';
-				//std::cout << "reached f parse\n";
 				face = ParseObjFace(line.substr(2, line.length()));
 				faces.emplace_back(face[0]);
 				faces.emplace_back(face[1]);

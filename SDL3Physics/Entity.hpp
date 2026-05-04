@@ -24,6 +24,7 @@ struct EntityHandle //if a reference to an object is stored for a long period of
 typedef struct Entity
 {	
 	char name[32];		//optional name of this enitity
+	char meshPath[32]; //relative filepath this entities mesh on disk
 	
 	EntityHandle selfHandle{};	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
 
@@ -36,8 +37,8 @@ typedef struct Entity
 	bool hasGravity = false;
 	bool hasPhysics = false;
 	bool hasCollision = false;
-	bool renderable = false;
 
+	bool renderable = false;
 	
 	bool enabled = false;		//should we skip updating this object?
 	bool allocated = false;		//this should also skip the traversal, used to allocate new objects

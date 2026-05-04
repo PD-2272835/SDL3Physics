@@ -4,7 +4,10 @@
 #include <vec.hpp>
 #include <vector>
 
-struct Asset {};
+struct Asset 
+{
+	bool gfxInitialized = false; //has this resource been initialized/transfered on the GPU
+};
 
 struct Vertex
 {

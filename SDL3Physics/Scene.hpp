@@ -1,7 +1,11 @@
 #ifndef _SCENE_HPP_
 #define _SCENE_HPP_
 
+#include "SDL3/SDL_gpu.h"
 #include "Entity.hpp"
+#include "Buffer.hpp"
+#include "AssetManagement.hpp"
+
 
 #define MAX_ENTITIES 1024
 
@@ -14,6 +18,10 @@ struct Scene
 	size_t maxEntities = MAX_ENTITIES;
 	Entity zero_entity = {}; //entity to allow operations to gracefully fail
 	float gravityStrength = 9.8;
+
+	//track buffers in scene struct
+	Buffer vertexBuffer;
+	Buffer indexBuffer;
 };
 
 
@@ -26,8 +34,10 @@ namespace SceneManagement
 	Entity* EntityFromHandle(Scene &scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
 	void UpdateEntities(Scene &scene, double timeDelta); //Update all entities in provided scene
 	
-	void InitializeScene(Scene &scene);
+	//void InitializeScene(Scene &scene);
+	void DrawEnitity(const Entity &entity);
 
+	void LoadEntityResources(const Entity& entity);
 	void LoadSceneResources(Scene &scene); //Load all required assets from a scene into assetManagement
 
 	//FIXME: better to return a dynamically allocated scene instance instead of operating on an existing scene

@@ -78,16 +78,40 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 				currentEntity.acceleration = 0;
 			}
 
-
+			//DrawEntity();
 
 		}
 	}
 }
 
+/*
+void SceneManagement::LoadEntityResources(Scene& scene, const Entity& entity)
+{
+	if (entity.allocated && entity.renderable && entity.meshPath != nullptr)
+	{
+		AssetManagement::GetAsset(entity.meshPath)
+		scene.vertexBuffer.UploadData(nullptr, );
+	}
+}
+*/
+
 void SceneManagement::LoadSceneResources(Scene& scene)
 {
 	//TODO: resource Management
+
+	for (size_t i = 0; i < scene.maxEntities; ++i)
+	{
+		Entity &currentEntity = scene.entities[i];
+
+		if (currentEntity.allocated && currentEntity.renderable)
+		{
+
+		}
+
+	}
 }
+
+
 
 
 //TODO: Scene File Serialization/Deserialization
