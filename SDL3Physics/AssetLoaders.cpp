@@ -68,25 +68,29 @@ std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
 	return res;
 }
 
-std::shared_ptr<Model> LoadObj(const char* path)
+std::shared_ptr<Mesh> LoadObj(const char* path)
 {
 	size_t size;
 	size_t startOffset = 0;
 	void* file = SDL_LoadFile(path, &size);
 
+	std::vector<mfg::vec3> positions;
+	std::vector<mfg::vec2> uvs;
+	std::vector<mfg::vec3> normals;
+
 	if (file)
 	{
-		std::shared_ptr<Model> model(new Model); //create a dynamically allocated smart ptr to the resulting model
 		std::string line;
 		int linenum = 0;
-		std::vector<std::vector<Internal_FaceIndex>> faces;
+		std::vector<Internal_FaceIndex> faces;
 		while (startOffset < size)
 		{
 			linenum++;
-			std::cout << linenum;
+			//std::cout << linenum;
 			line = GetLineIter((char*)file, size, startOffset);
 			if (line.length() == 0) continue;
-			std::cout << " " << line << " ";
+			//std::cout << " " << line << " ";
+			std::vector<Internal_FaceIndex> face;
 			switch (line.c_str()[0])
 			{
 			case 'v':
@@ -94,15 +98,18 @@ std::shared_ptr<Model> LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					std::cout << "v " << mfg::VecToString(ParseObjVector<3>(line.substr(2, line.length()))) << "\n";
+					//std::cout << "v " << mfg::VecToString(ParseObjVector<3>(line.substr(2, line.length()))) << "\n";
+					positions.push_back(ParseObjVector<3>(line.substr(2, line.length())));
 					break;
 				case 't':
 					//UV
-					std::cout << "vt " << mfg::VecToString(ParseObjVector<2>(line.substr(4, line.length()))) << "\n";
+					//std::cout << "vt " << mfg::VecToString(ParseObjVector<2>(line.substr(4, line.length()))) << "\n";
+					uvs.push_back(ParseObjVector<2>(line.substr(4, line.length())));
 					break;
 				case 'n':
 					//normal
-					std::cout << "vn " << mfg::VecToString(ParseObjVector<3>(line.substr(3, line.length()))) << "\n";
+					//std::cout << "vn " << mfg::VecToString(ParseObjVector<3>(line.substr(3, line.length()))) << "\n";
+					normals.push_back(ParseObjVector<3>(line.substr(3, line.length())));
 					break;
 				default:
 					break;
@@ -111,17 +118,34 @@ std::shared_ptr<Model> LoadObj(const char* path)
 			case 'f':
 				//parse faces
 				//std::cout << "f " << ParseObjData(line.substr(3, line.length()), ' ') << '\n';
-				std::cout << "reached f parse\n";
-
-				 faces.emplace_back(ParseObjFace(line.substr(2, line.length())));
+				//std::cout << "reached f parse\n";
+				face = ParseObjFace(line.substr(2, line.length()));
+				faces.emplace_back(face[0]);
+				faces.emplace_back(face[1]);
+				faces.emplace_back(face[2]);
 				break;
 			default:
 				break;
 			}
 		}
 		
-
 		SDL_free(file);
+
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
+		std::vector<Texture*> textures;
+
+		//fill data into model
+		for (size_t i = 0; i < faces.size(); ++i)
+		{
+			Internal_FaceIndex face = faces.at(i);
+			vertices.emplace_back(positions.at(face.data[0]),
+				normals.at(face.data[2]),
+				uvs.at(face.data[1]));
+			indices.emplace_back(i); //casts i to uint32_t
+		}
+
+		std::shared_ptr<Mesh> model(new Mesh(vertices, indices, textures)); //create a dynamically allocated smart ptr to the resulting model
 		return model;
 	}
 

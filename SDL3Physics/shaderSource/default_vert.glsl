@@ -37,5 +37,5 @@ void main()
 {
 	float pulse = 1;//sin(time * 2.0) * 0.5 + 0.5;
 	gl_Position = GetProjection() * View * Model * vec4(a_position, 1.0f); //projection, view, model
-	v_color = vec4(a_normal.xyz, a_uv.x * pulse);
+	v_color = vec4(a_normal.xyz, 1);
 }

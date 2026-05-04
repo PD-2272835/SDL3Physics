@@ -20,6 +20,7 @@ SDL_GPUDevice* device;
 Buffer vertexBuffer;
 Buffer vertexStorageBuffer;
 Buffer indexBuffer;
+std::shared_ptr<Mesh> model;
 
 SDL_GPUTransferBuffer* transferBuffer;
 SDL_GPUGraphicsPipeline* graphicsPipeline;
@@ -71,8 +72,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	std::cout << sizeof(void*) << "voidptr\n";
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
-
-	LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/sedan-sports.obj");
 
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
 	device = SDL_CreateGPUDevice(PLATFORM_TARGET_TYPE, true, NULL);
@@ -141,21 +140,21 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	vertexShader.Delete();
 	fragmentShader.Delete();
 
-
+	model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
 
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 
-	vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, sizeof(quad));
+	vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
 	vertexStorageBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
 	
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-	vertexBuffer.UploadData(commandBuffer, (void*)quad, sizeof(quad), 0);
+	vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
 
 	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f) };
 	vertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
-	indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, sizeof(quadIndices));
-	indexBuffer.UploadData(commandBuffer, (void*)quadIndices, sizeof(quadIndices), 0);
+	indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
+	indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
@@ -193,7 +192,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
 	uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
-	uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, 0.f, -10.f));
+	uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
 	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
@@ -213,13 +212,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	
 
 	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
-	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
 
 	//DRAW COMMAND!!
 	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
-	SDL_DrawGPUIndexedPrimitives(renderPass, 6, 1, 0, 0, 0);
+	SDL_DrawGPUIndexedPrimitives(renderPass, model->Indices.size(), 1, 0, 0, 0);
 
 	SDL_EndGPURenderPass(renderPass);
 	//Anything else we want to do goes below here
