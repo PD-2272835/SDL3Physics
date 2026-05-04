@@ -8,7 +8,7 @@
 
 struct Internal_FaceIndex
 {
-	Uint32 data[3];
+	Uint32 data[3]{};
 };
 
 

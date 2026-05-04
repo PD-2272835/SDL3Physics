@@ -72,7 +72,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
-	//LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj");
+	LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/sedan-sports.obj");
 
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
 	device = SDL_CreateGPUDevice(PLATFORM_TARGET_TYPE, true, NULL);

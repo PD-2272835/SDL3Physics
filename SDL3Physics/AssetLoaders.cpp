@@ -11,7 +11,7 @@ std::string GetLineIter(const char* dataStream, const size_t &size, size_t &star
 	for (size_t i = start; i < size; ++i)
 	{
 		ch = dataStream[i];
-		if (dataStream[i] && ch != '\r') //strtok might have been a better idea
+		if (dataStream[i] && ch != '\r')
 		{
 			r.push_back(ch);
 		}
@@ -44,13 +44,15 @@ Internal_FaceIndex ParseFaceIndex(std::string line)
 	auto pos = line.find('/');
 	while (pos != std::string::npos)
 	{
-		res.data[i] = std::stoi(line.substr(0, pos));
+		res.data[i] = std::stoi(line.substr(0, pos)) - 1;
 		line.erase(0, pos + 1);
 		pos = line.find('/');
 		++i;
 	}
+	res.data[i] = std::stoi(line.substr(0, pos)) - 1; //FIXME gotta be a better way of ensuring last element gets processed
 	return res;
 }
+
 
 std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
 {
@@ -62,6 +64,8 @@ std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
 		line.erase(0, pos + 1);
 		pos = line.find(' ');
 	}
+	res.push_back(ParseFaceIndex(line.substr(0, pos))); //FIXME gotta be a better way of ensuring last element gets processed
+	return res;
 }
 
 std::shared_ptr<Model> LoadObj(const char* path)
@@ -75,12 +79,14 @@ std::shared_ptr<Model> LoadObj(const char* path)
 		std::shared_ptr<Model> model(new Model); //create a dynamically allocated smart ptr to the resulting model
 		std::string line;
 		int linenum = 0;
+		std::vector<std::vector<Internal_FaceIndex>> faces;
 		while (startOffset < size)
 		{
 			linenum++;
 			std::cout << linenum;
 			line = GetLineIter((char*)file, size, startOffset);
 			if (line.length() == 0) continue;
+			std::cout << " " << line << " ";
 			switch (line.c_str()[0])
 			{
 			case 'v':
@@ -105,7 +111,9 @@ std::shared_ptr<Model> LoadObj(const char* path)
 			case 'f':
 				//parse faces
 				//std::cout << "f " << ParseObjData(line.substr(3, line.length()), ' ') << '\n';
-				ParseObjFace(line.substr(3, line.length()));
+				std::cout << "reached f parse\n";
+
+				 faces.emplace_back(ParseObjFace(line.substr(2, line.length())));
 				break;
 			default:
 				break;
