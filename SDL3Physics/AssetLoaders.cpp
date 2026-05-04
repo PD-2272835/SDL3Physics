@@ -24,19 +24,45 @@ std::string GetLineIter(const char* dataStream, const size_t &size, size_t &star
 }
 
 template<size_t dim>
-mfg::vec<dim, float> ParseObjData(std::string line, char del)
+mfg::vec<dim, float> ParseObjVector(std::string line)
 {
 	mfg::vec<dim, float> r;
-	auto pos = line.find(del); //find the first delimiter
+	auto pos = line.find(' '); //find the first delimiter
 	for (size_t i = 0; i < dim; ++i)
 	{
 		r[i] = std::stof(line.substr(0, pos)); //convert current number from string to float
 		line = line.erase(0, pos+1); //pos + 1 to also remove the delimiter
-		pos = line.find(del); //set pos to the position of the next delimiter
+		pos = line.find(' '); //set pos to the position of the next delimiter
 	}
 	return r;
 }
 
+Internal_FaceIndex ParseFaceIndex(std::string line)
+{
+	Internal_FaceIndex res;
+	size_t i = 0;
+	auto pos = line.find('/');
+	while (pos != std::string::npos)
+	{
+		res.data[i] = std::stoi(line.substr(0, pos));
+		line.erase(0, pos + 1);
+		pos = line.find('/');
+		++i;
+	}
+	return res;
+}
+
+std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
+{
+	std::vector<Internal_FaceIndex> res;
+	auto pos = line.find(' ');
+	while (pos != std::string::npos)
+	{
+		res.push_back(ParseFaceIndex(line.substr(0, pos)));
+		line.erase(0, pos + 1);
+		pos = line.find(' ');
+	}
+}
 
 std::shared_ptr<Model> LoadObj(const char* path)
 {
@@ -62,15 +88,15 @@ std::shared_ptr<Model> LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					std::cout << "v " << mfg::VecToString(ParseObjData<3>(line.substr(2, line.length()), ' ')) << "\n";
+					std::cout << "v " << mfg::VecToString(ParseObjVector<3>(line.substr(2, line.length()))) << "\n";
 					break;
 				case 't':
 					//UV
-					std::cout << "vt " << mfg::VecToString(ParseObjData<2>(line.substr(4, line.length()), ' ')) << "\n";
+					std::cout << "vt " << mfg::VecToString(ParseObjVector<2>(line.substr(4, line.length()))) << "\n";
 					break;
 				case 'n':
 					//normal
-					std::cout << "vn " << mfg::VecToString(ParseObjData<3>(line.substr(3, line.length()), ' ')) << "\n";
+					std::cout << "vn " << mfg::VecToString(ParseObjVector<3>(line.substr(3, line.length()))) << "\n";
 					break;
 				default:
 					break;
@@ -79,6 +105,7 @@ std::shared_ptr<Model> LoadObj(const char* path)
 			case 'f':
 				//parse faces
 				//std::cout << "f " << ParseObjData(line.substr(3, line.length()), ' ') << '\n';
+				ParseObjFace(line.substr(3, line.length()));
 				break;
 			default:
 				break;
