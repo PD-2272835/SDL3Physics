@@ -21,7 +21,7 @@ Buffer vertexBuffer;
 Buffer vertexStorageBuffer;
 Buffer indexBuffer;
 std::shared_ptr<Mesh> model;
-
+SDL_GPUTexture* depthTexture;
 SDL_GPUTransferBuffer* transferBuffer;
 SDL_GPUGraphicsPipeline* graphicsPipeline;
 
@@ -131,8 +131,29 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//rasterizer state
 	//multisample state
 	//depth stencil state
+
+	const SDL_GPUTextureFormat depthFormat = SDL_GPU_TEXTUREFORMAT_D24_UNORM;
+
+	SDL_GPUTextureCreateInfo depthTexInfo = {};
+	depthTexInfo.format = depthFormat;
+	depthTexInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+	depthTexInfo.width = Width;
+	depthTexInfo.height = Height;
+	depthTexInfo.layer_count_or_depth = 1;
+	depthTexInfo.num_levels = 1;
+
+	depthTexture = SDL_CreateGPUTexture(device, &depthTexInfo);
+
+	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+	pipelineInfo.depth_stencil_state.enable_depth_test = true;
+	pipelineInfo.depth_stencil_state.enable_depth_write = true;
+
+
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
+
+	pipelineInfo.target_info.has_depth_stencil_target = true;
+	pipelineInfo.target_info.depth_stencil_format = depthFormat;
 
 
 	graphicsPipeline = SDL_CreateGPUGraphicsPipeline(device, &pipelineInfo);
@@ -150,7 +171,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
 	vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
 
-	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.1f, 100.f) };
+	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.01f, 100.f) };
 	vertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
 	indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
@@ -183,6 +204,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 		return SDL_APP_CONTINUE;
 	}
 
+	SDL_GPUDepthStencilTargetInfo depthInfo = {};
+	depthInfo.texture = depthTexture;
+	depthInfo.load_op = SDL_GPU_LOADOP_CLEAR;
+	depthInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
+	depthInfo.clear_depth = 1.0f;
+
+
 	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
 	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
@@ -196,7 +224,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
-	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, &depthInfo);
 
 	//bind pipeline to renderpass
 	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
@@ -250,6 +278,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 	vertexBuffer.Delete();
 	vertexStorageBuffer.Delete();
 	indexBuffer.Delete();
+	SDL_ReleaseGPUTexture(device, depthTexture);
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);
 }

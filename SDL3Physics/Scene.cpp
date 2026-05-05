@@ -84,16 +84,16 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 	}
 }
 
-/*
-void SceneManagement::LoadEntityResources(Scene& scene, const Entity& entity)
+
+void SceneManagement::LoadEntityResources(Scene &scene, const Entity &entity)
 {
 	if (entity.allocated && entity.renderable && entity.meshPath != nullptr)
 	{
-		AssetManagement::GetAsset(entity.meshPath)
-		scene.vertexBuffer.UploadData(nullptr, );
+		AssetManagement::GetInstance()->GetAsset(entity.meshPath);
+		//scene.vertexBuffer.UploadData(nullptr, );
 	}
 }
-*/
+
 
 void SceneManagement::LoadSceneResources(Scene& scene)
 {

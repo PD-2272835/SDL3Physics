@@ -6,7 +6,7 @@
 
 struct Asset 
 {
-	bool gfxInitialized = false; //has this resource been initialized/transfered on the GPU
+	bool gfxInitialized = false; //has this resource been loaded onto the GPU
 };
 
 struct Vertex
