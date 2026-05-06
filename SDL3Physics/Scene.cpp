@@ -85,7 +85,7 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 }
 
 
-void SceneManagement::LoadEntityResources(Scene &scene, const Entity &entity)
+void SceneManagement::LoadEntityResources(Scene &scene, SDL_GPUCommandBuffer* cmd, const Entity &entity)
 {
 	if (entity.allocated && entity.renderable && entity.meshPath != nullptr)
 	{
@@ -93,38 +93,36 @@ void SceneManagement::LoadEntityResources(Scene &scene, const Entity &entity)
 		
 		scene.assetRefs.push_back(ref);
 
-		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model
+		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model uwu
 		//this should be changed if loading an obj or other 3D model returns a different struct
 		Mesh* mesh = static_cast<Mesh*>(ref.get());
 		GFXHandle handle;
-
+		bool uploadCheck = false;
 		handle.vertexOffset = scene.vertexBuffer.End;
 		handle.vertexSize = mesh->Vertices.size() * sizeof(Vertex);
-		scene.vertexBuffer.UploadData(nullptr, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
+		uploadCheck |= scene.vertexBuffer.UploadData(cmd, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
 
 		handle.indexOffset = scene.indexBuffer.End;
 		handle.indexSize = mesh->Indices.size() * sizeof(uint32_t);
-		scene.indexBuffer.UploadData(nullptr, (void*)mesh->Indices.data(), handle.indexSize, handle.indexOffset);
+		uploadCheck |= scene.indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize, handle.indexOffset);
 
-		
-	
+		handle.gfxInitialized = uploadCheck;
+
+		mesh->handle = handle;
 	}
 }
 
 
-void SceneManagement::LoadSceneResources(Scene& scene)
+void SceneManagement::LoadSceneResources(Scene& scene, SDL_GPUDevice* device)
 {
-	//TODO: resource Management
+	SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
 
+	//TODO: resource Management
 	for (size_t i = 0; i < scene.maxEntities; ++i)
 	{
 		Entity &currentEntity = scene.entities[i];
 
-		if (currentEntity.allocated && currentEntity.renderable)
-		{
-
-		}
-
+		LoadEntityResources(scene, cmd, currentEntity);
 	}
 }
 

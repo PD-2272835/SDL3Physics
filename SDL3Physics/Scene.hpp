@@ -39,8 +39,8 @@ namespace SceneManagement
 	//void InitializeScene(Scene &scene);
 	void DrawEnitity(const Entity &entity);
 
-	void LoadEntityResources(Scene &scene, const Entity &entity);
-	void LoadSceneResources(Scene &scene); //Load all required assets from a scene into assetManagement
+	void LoadEntityResources(Scene& scene, SDL_GPUCommandBuffer* cmd, const Entity& entity);
+	void LoadSceneResources(Scene &scene, SDL_GPUDevice* device); //Load all required assets from a scene into assetManagement
 
 	//FIXME: better to return a dynamically allocated scene instance instead of operating on an existing scene
 	bool LoadSceneFromFile(Scene &scene);

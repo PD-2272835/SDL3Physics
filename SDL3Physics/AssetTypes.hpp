@@ -8,17 +8,17 @@
 
 struct GFXHandle
 {
-	bool gfxInitialized = false; //has this resource been loaded onto the GPU
 	uint32_t vertexOffset = 0;
 	uint32_t vertexSize = 0;
 	uint32_t indexOffset = 0;
 	uint32_t indexSize = 0;
+	bool gfxInitialized = false; //has this resource been loaded onto the GPU
 	//THIS DOES NOT YET MANAGE TEXTURES
 };
 
 struct Asset
 {
-	GFXHandle handle;
+	GFXHandle handle = {};
 };
 
 
