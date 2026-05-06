@@ -89,8 +89,15 @@ void SceneManagement::LoadEntityResources(Scene &scene, const Entity &entity)
 {
 	if (entity.allocated && entity.renderable && entity.meshPath != nullptr)
 	{
-		AssetManagement::GetInstance()->GetAsset(entity.meshPath);
-		//scene.vertexBuffer.UploadData(nullptr, );
+		std::shared_ptr<Asset> ref = AssetManagement::GetInstance()->GetAsset(entity.meshPath); //intermediate step to store 
+		
+		scene.assetRefs.push_back(ref);
+
+		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model
+		//this should be changed if loading an obj or other 3D model returns a different struct
+		Mesh* mesh = static_cast<Mesh*>(ref.get());
+
+		scene.vertexBuffer.UploadData(nullptr, (void*)mesh->Vertices.data(), mesh->handle.dataSize, scene.vertexBuffer.End);
 	}
 }
 

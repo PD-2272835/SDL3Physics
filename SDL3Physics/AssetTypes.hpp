@@ -3,11 +3,21 @@
 
 #include <vec.hpp>
 #include <vector>
+#include <variant>
 
-struct Asset 
+
+struct GFXHandle
 {
 	bool gfxInitialized = false; //has this resource been loaded onto the GPU
+	uint32_t bufferOffset = 0;
+	uint32_t dataSize = 0;
 };
+
+struct Asset
+{
+	GFXHandle handle;
+};
+
 
 struct Vertex
 {

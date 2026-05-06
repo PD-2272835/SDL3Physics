@@ -4,7 +4,7 @@
 #include "SDL3/SDL_gpu.h"
 #include "Entity.hpp"
 #include "Buffer.hpp"
-#include "AssetManagement.hpp"
+#include "AssetManagement.hpp" //includes std::vector
 
 
 #define MAX_ENTITIES 1024
@@ -22,6 +22,8 @@ struct Scene
 	//track buffers in scene struct
 	Buffer vertexBuffer;
 	Buffer indexBuffer;
+
+	std::vector<std::shared_ptr<Asset>> assetRefs; //manage the lifetime of objects and don't unload them until this scene is destroyed
 };
 
 

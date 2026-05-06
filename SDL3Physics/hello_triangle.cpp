@@ -13,7 +13,7 @@
 #include "Shader.hpp"
 #include "Buffer.hpp"
 #include "Entity.hpp"
-#include "AssetLoaders.hpp"
+#include "AssetManagement.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -133,23 +133,30 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//depth stencil state
 
 	//depth testing
+	/*
+	if (SDL_GPUTextureSupportsFormat(device, SDL_GPU_TEXTUREFORMAT_D16_UNORM, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET))
+	{
+		std::cout << "yes\n";
+	}
 	const SDL_GPUTextureFormat depthFormat = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
-
+	
 	SDL_GPUTextureCreateInfo depthTexInfo = {};
+	depthTexInfo.type = SDL_GPU_TEXTURETYPE_2D;
 	depthTexInfo.format = depthFormat;
 	depthTexInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
 	depthTexInfo.width = Width;
 	depthTexInfo.height = Height;
 	depthTexInfo.layer_count_or_depth = 1;
 	depthTexInfo.num_levels = 1;
+	depthTexInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 	depthTexture = SDL_CreateGPUTexture(device, &depthTexInfo);
-
-	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
+	
 	pipelineInfo.depth_stencil_state.enable_depth_test = true;
 	pipelineInfo.depth_stencil_state.enable_depth_write = true;
-	pipelineInfo.target_info.has_depth_stencil_target = true;
+	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
 	pipelineInfo.target_info.depth_stencil_format = depthFormat;
-
+	pipelineInfo.target_info.has_depth_stencil_target = true;
+	*/
 	//output buffers
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
@@ -160,10 +167,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	vertexShader.Delete();
 	fragmentShader.Delete();
 
+	//auto something = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj").get();
+
 	model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
 
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
-
 	vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
 	vertexStorageBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
 	
@@ -177,9 +185,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
 
+
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
-
-
 
 	return SDL_APP_CONTINUE;
 }
@@ -210,20 +217,25 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
-
+	
+	/*
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
 	depthInfo.texture = depthTexture;
 	depthInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	depthInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
 	depthInfo.clear_depth = 1.0f;
-	
+	*/
 	uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
 	uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
 	uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
 	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
-	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, &depthInfo);
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);
+
+	//SDL_GPUViewport vp = { 0, 0, Width, Height, 0.0f, 1.0f };
+
+	//SDL_SetGPUViewport(renderPass, &vp);
 
 	//bind pipeline to renderpass
 	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);

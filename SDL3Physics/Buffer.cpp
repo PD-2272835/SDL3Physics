@@ -15,7 +15,7 @@ Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
 
 void Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset)
 {
-	if (End + dataSize >= Info.size) //check that there is space in this buffer
+	if (End + dataSize > Info.size) //check that there is space in this buffer
 	{
 		return;
 	}
@@ -44,6 +44,8 @@ void Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 	
 	SDL_EndGPUCopyPass(copyPass); //must end pass before
 	SDL_ReleaseGPUTransferBuffer(Device, transfer);
+
+	End += dataSize;
 }
 
 void Buffer::Delete()
