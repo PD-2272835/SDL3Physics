@@ -8,6 +8,7 @@ public:
 	SDL_GPUBufferCreateInfo Info;
 	SDL_GPUDevice* Device;
 	SDL_GPUBuffer* ID;
+	size_t End;
 
 	Buffer() : Info({}), Device(nullptr), ID(nullptr) {};
 	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
