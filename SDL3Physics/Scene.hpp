@@ -34,12 +34,12 @@ namespace SceneManagement
 	void DestroyEntity(Scene &scene, const EntityHandle &entityHandle);
 
 	Entity* EntityFromHandle(Scene &scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
-	void UpdateEntities(Scene &scene, double timeDelta); //Update all entities in provided scene
+	void UpdateEntities(SDL_GPURenderPass* pass, Scene& scene, double timeDelta); //Update all entities in provided scene
 	
-	//void InitializeScene(Scene &scene);
-	void DrawEnitity(const Entity &entity);
-
-	void LoadEntityResources(Scene& scene, SDL_GPUCommandBuffer* cmd, const Entity& entity);
+	void DrawEntity(SDL_GPURenderPass* renderPass, const Entity& entity);
+	void DrawScene(SDL_GPURenderPass* renderPass, Scene& scene);
+	
+	void LoadEntityResources(Scene &scene, SDL_GPUCommandBuffer* cmd, const Entity &entity);
 	void LoadSceneResources(Scene &scene, SDL_GPUDevice* device); //Load all required assets from a scene into assetManagement
 
 	//FIXME: better to return a dynamically allocated scene instance instead of operating on an existing scene

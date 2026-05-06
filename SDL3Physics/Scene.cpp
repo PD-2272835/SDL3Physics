@@ -53,8 +53,19 @@ void SceneManagement::DestroyEntity(Scene &scene, const EntityHandle& entityHand
 }
 
 //this should run each frame
-void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
+void SceneManagement::UpdateEntities(SDL_GPURenderPass* renderPass, Scene &scene, double timeDelta)
 {
+	SDL_GPUBufferBinding vertexBindings[1];
+	vertexBindings[0].buffer = scene.vertexBuffer.ID;
+	vertexBindings[0].offset = 0;
+
+	SDL_GPUBufferBinding indexBindings[1];
+	indexBindings[0].buffer = scene.indexBuffer.ID;
+	indexBindings[0].offset = 0;
+
+	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+
 	for (size_t i = 0; i < scene.maxEntities; ++i)
 	{
 		Entity currentEntity = scene.entities[i];
@@ -78,9 +89,51 @@ void SceneManagement::UpdateEntities(Scene &scene, double timeDelta)
 				currentEntity.acceleration = 0;
 			}
 
-			//DrawEntity();
+			//draw this entity
+			if (currentEntity.renderable)
+			{
+				DrawEntity(renderPass, currentEntity);
+			}
 
 		}
+	}
+
+	//DrawScene(renderPass, scene);
+}
+
+
+//Possibly use this to decouple entity updates from entity drawing
+void SceneManagement::DrawScene(SDL_GPURenderPass* renderPass, Scene& scene)
+{
+	SDL_GPUBufferBinding vertexBindings[1];
+	vertexBindings[0].buffer = scene.vertexBuffer.ID;
+	vertexBindings[0].offset = 0;
+
+	SDL_GPUBufferBinding indexBindings[1];
+	indexBindings[0].buffer = scene.indexBuffer.ID;
+	indexBindings[0].offset = 0;
+
+	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+
+	for (size_t i = 0; i < scene.maxEntities; ++i)
+	{
+		Entity entity = scene.entities[i];
+		if (entity.renderable && entity.allocated && entity.enabled)
+		{
+			DrawEntity(renderPass, entity);
+		}
+	}
+}
+
+
+void SceneManagement::DrawEntity(SDL_GPURenderPass* renderPass, const Entity& entity)
+{
+	GFXHandle handle = AssetManagement::GetInstance()->GetAsset(entity.meshPath).get()->handle;
+
+	if (handle.gfxInitialized)
+	{
+		SDL_DrawGPUIndexedPrimitives(renderPass, handle.indexSize, 1, handle.indexOffset, handle.vertexOffset, 0);
 	}
 }
 
@@ -103,8 +156,8 @@ void SceneManagement::LoadEntityResources(Scene &scene, SDL_GPUCommandBuffer* cm
 		uploadCheck |= scene.vertexBuffer.UploadData(cmd, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
 
 		handle.indexOffset = scene.indexBuffer.End;
-		handle.indexSize = mesh->Indices.size() * sizeof(uint32_t);
-		uploadCheck |= scene.indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize, handle.indexOffset);
+		handle.indexSize = mesh->Indices.size();
+		uploadCheck |= scene.indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize * sizeof(uint32_t), handle.indexOffset);
 
 		handle.gfxInitialized = uploadCheck;
 
