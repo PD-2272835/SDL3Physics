@@ -14,7 +14,7 @@ public:
 	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
 
 
-	void UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
+	bool UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
 	//void* DownloadData(Uint32 size); TODO
 	
 

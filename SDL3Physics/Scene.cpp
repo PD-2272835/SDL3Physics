@@ -96,8 +96,18 @@ void SceneManagement::LoadEntityResources(Scene &scene, const Entity &entity)
 		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model
 		//this should be changed if loading an obj or other 3D model returns a different struct
 		Mesh* mesh = static_cast<Mesh*>(ref.get());
+		GFXHandle handle;
 
-		scene.vertexBuffer.UploadData(nullptr, (void*)mesh->Vertices.data(), mesh->handle.dataSize, scene.vertexBuffer.End);
+		handle.vertexOffset = scene.vertexBuffer.End;
+		handle.vertexSize = mesh->Vertices.size() * sizeof(Vertex);
+		scene.vertexBuffer.UploadData(nullptr, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
+
+		handle.indexOffset = scene.indexBuffer.End;
+		handle.indexSize = mesh->Indices.size() * sizeof(uint32_t);
+		scene.indexBuffer.UploadData(nullptr, (void*)mesh->Indices.data(), handle.indexSize, handle.indexOffset);
+
+		
+	
 	}
 }
 
