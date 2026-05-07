@@ -3,7 +3,6 @@
 
 #include <vec.hpp>
 #include <vector>
-#include <variant>
 
 
 struct GFXHandle

@@ -23,8 +23,8 @@ struct EntityHandle //if a reference to an object is stored for a long period of
 // -TheStackFrame - https://www.youtube.com/watch?v=j8v9O3aFk04
 typedef struct Entity
 {	
-	char name[32];		//optional name of this enitity
-	char meshPath[32]; //relative filepath this entities mesh on disk
+	std::string name;		//optional name of this enitity
+	std::string meshPath; //relative filepath this entities mesh on disk
 	
 	EntityHandle selfHandle{};	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
 

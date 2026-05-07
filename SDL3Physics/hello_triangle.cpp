@@ -14,16 +14,14 @@
 #include "Buffer.hpp"
 #include "Entity.hpp"
 #include "AssetManagement.hpp"
+#include "Scene.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
-Buffer vertexBuffer;
 Buffer vertexStorageBuffer;
-Buffer indexBuffer;
-std::shared_ptr<Mesh> model;
 SDL_GPUTexture* depthTexture;
-SDL_GPUTransferBuffer* transferBuffer;
 SDL_GPUGraphicsPipeline* graphicsPipeline;
+Scene* mainScene;
 
 
 SDL_GPUTexture* swapchainTexture; //RenderTarget equivalent (frame buffer)
@@ -46,12 +44,12 @@ const static Uint16 quadIndices[]
 };
 
 
-struct UniformBuffer
+/*struct UniformBuffer
 {
 	mfg::mat4 View;
 	mfg::mat4 Model;
 	float time;
-};
+};*/
 
 static UniformBuffer uniformData{};
 
@@ -70,6 +68,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	std::cout << alignof(Entity) << "\n";
 	std::cout << sizeof(EntityHandle) << "handle\n";
 	std::cout << sizeof(void*) << "voidptr\n";
+	std::cout << sizeof(Vertex) << "vertex\n";
 
 	window = SDL_CreateWindow("Test Window!", Width, Height, SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS); //SDL_WINDOW_FULLSCREEN & SDL_WINDOW_BORDERLESS
 
@@ -107,7 +106,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//enable color blending
 	SDL_GPUColorTargetDescription colorTargetDescriptions[1];
 	colorTargetDescriptions[0] = {};
-	colorTargetDescriptions[0].blend_state.enable_blend = false; //true
+	colorTargetDescriptions[0].blend_state.enable_blend = true;
 	colorTargetDescriptions[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
 	colorTargetDescriptions[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
 	colorTargetDescriptions[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
@@ -133,7 +132,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//depth stencil state
 
 	//depth testing
-	
+	/*
 	if (SDL_GPUTextureSupportsFormat(device, SDL_GPU_TEXTUREFORMAT_D16_UNORM, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET))
 	{
 		std::cout << "yes\n";
@@ -156,7 +155,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
 	pipelineInfo.target_info.depth_stencil_format = depthFormat;
 	pipelineInfo.target_info.has_depth_stencil_target = true;
-	
+	*/
 	//output buffers
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
@@ -169,7 +168,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	//auto something = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj").get();
 
-	model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
+	//model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
 
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 	
@@ -186,15 +185,35 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
 
-
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
+
+	mainScene = SceneManagement::CreateScene(device);
+	Entity* entity = SceneManagement::CreateEntity(mainScene);
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
+	entity->name = "blood sacrifice";
+	entity->renderable = true;
+	entity->hasGravity = true;
+
+	SceneManagement::LoadSceneResources(mainScene, device);
+
 
 	return SDL_APP_CONTINUE;
 }
 
+//https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
+struct Clock
+{
+	uint32_t last_tick_time = 0;
+	uint32_t delta = 0;
 
-
-
+	void tick()
+	{
+		uint32_t tick_time = SDL_GetTicks();
+		delta = tick_time - last_tick_time;
+		last_tick_time = tick_time;
+	}
+};
+Clock Time;
 
 //AppIterate is called every frame/background update - roughly equivalent to Unity's `Update()` callback
 SDL_AppResult SDL_AppIterate(void *appstate)
@@ -210,7 +229,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 		std::cout << "ended frame early\n";
 		return SDL_APP_CONTINUE;
 	}
-
+	
 
 	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
@@ -232,28 +251,27 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
-	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, &depthInfo);
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);
 
 	//bind pipeline to renderpass
 	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
 
 	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
 
-
-
-
-
+	//cool stuff?
+	SceneManagement::UpdateEntities(commandBuffer, renderPass, mainScene, Time.delta);
 
 
 
 	//DRAW COMMAND!!
 	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
-	SDL_DrawGPUIndexedPrimitives(renderPass, model->Indices.size(), 1, 0, 0, 0);
+	//SDL_DrawGPUIndexedPrimitives(renderPass, model->Indices.size(), 1, 0, 0, 0);
 
 	SDL_EndGPURenderPass(renderPass);
 	//Anything else we want to do goes below here
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
+	Time.tick();
 	return SDL_APP_CONTINUE;
 }
 
@@ -277,9 +295,8 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
 	std::cout << std::endl;
 	SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline);
-	vertexBuffer.Delete();
 	vertexStorageBuffer.Delete();
-	indexBuffer.Delete();
+	SceneManagement::DeleteScene(mainScene);
 	SDL_ReleaseGPUTexture(device, depthTexture);
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);
