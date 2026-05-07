@@ -9,6 +9,17 @@
 
 #define MAX_ENTITIES 1024
 
+
+#include "matrix.hpp"
+
+//Idk where else to put this
+struct UniformBuffer
+{
+	mfg::mat4 View;
+	mfg::mat4 Model;
+	float time;
+};
+
 //global scene state
 struct Scene
 {

@@ -53,7 +53,7 @@ void SceneManagement::DestroyEntity(Scene &scene, const EntityHandle& entityHand
 }
 
 //this should run each frame
-void SceneManagement::UpdateEntities(SDL_GPURenderPass* renderPass, Scene &scene, double timeDelta)
+void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene &scene, double timeDelta)
 {
 	SDL_GPUBufferBinding vertexBindings[1];
 	vertexBindings[0].buffer = scene.vertexBuffer.ID;
@@ -92,7 +92,17 @@ void SceneManagement::UpdateEntities(SDL_GPURenderPass* renderPass, Scene &scene
 			//draw this entity
 			if (currentEntity.renderable)
 			{
-				DrawEntity(renderPass, currentEntity);
+				mfg::mat4 model = mfg::Translate(currentEntity.position);
+				model = model * mfg::Scale(currentEntity.scale); //FIXME
+
+				mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
+				//FIXME: the view matrix should be pulled from a camera of some kind
+
+				//update push constants so that this entity is rendered with it's transformation parameters
+				UniformBuffer uniformData = { view, model, timeDelta };
+
+				SDL_PushGPUVertexUniformData(cmd, 0, &uniformData, sizeof(uniformData));
+				SceneManagement::DrawEntity(renderPass, currentEntity);
 			}
 
 		}

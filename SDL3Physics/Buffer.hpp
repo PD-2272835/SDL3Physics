@@ -2,6 +2,7 @@
 #define _BUFFER_HPP_
 #include <SDL3/SDL_gpu.h>
 
+
 class Buffer
 {
 public:

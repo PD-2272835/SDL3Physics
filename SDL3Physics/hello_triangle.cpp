@@ -107,7 +107,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//enable color blending
 	SDL_GPUColorTargetDescription colorTargetDescriptions[1];
 	colorTargetDescriptions[0] = {};
-	colorTargetDescriptions[0].blend_state.enable_blend = true;
+	colorTargetDescriptions[0].blend_state.enable_blend = false; //true
 	colorTargetDescriptions[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
 	colorTargetDescriptions[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
 	colorTargetDescriptions[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
@@ -133,7 +133,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//depth stencil state
 
 	//depth testing
-	/*
+	
 	if (SDL_GPUTextureSupportsFormat(device, SDL_GPU_TEXTUREFORMAT_D16_UNORM, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET))
 	{
 		std::cout << "yes\n";
@@ -156,7 +156,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
 	pipelineInfo.target_info.depth_stencil_format = depthFormat;
 	pipelineInfo.target_info.has_depth_stencil_target = true;
-	*/
+	
 	//output buffers
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
@@ -172,17 +172,18 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
 
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
-	vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
+	
+	//vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
 	vertexStorageBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
 	
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-	vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
-
+	//vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
+	
 	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.3f, 1000.f) };
 	vertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
-	indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
-	indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
+	//indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
+	//indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
 
 
@@ -218,42 +219,32 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
 	
-	/*
+	
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
 	depthInfo.texture = depthTexture;
 	depthInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	depthInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
 	depthInfo.clear_depth = 1.0f;
-	*/
+	
 	uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
 	uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
 	uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
 	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
-	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);
-
-	//SDL_GPUViewport vp = { 0, 0, Width, Height, 0.0f, 1.0f };
-
-	//SDL_SetGPUViewport(renderPass, &vp);
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, &depthInfo);
 
 	//bind pipeline to renderpass
 	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
 
-	//bind vertex buffer - TODO: create methods for this in buffer class
-	SDL_GPUBufferBinding vertexBindings[1];
-	vertexBindings[0].buffer = vertexBuffer.ID;
-	vertexBindings[0].offset = 0;
-
-	SDL_GPUBufferBinding indexBindings[1];
-	indexBindings[0].buffer = indexBuffer.ID;
-	indexBindings[0].offset = 0;
-	
-
-	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
-	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-
 	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
+
+
+
+
+
+
+
 
 	//DRAW COMMAND!!
 	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
