@@ -23,12 +23,6 @@ void SceneManagement::DeleteScene(Scene* scene)
 	delete scene;
 }
 
-//this should allow any other initialization steps that may be required
-void SceneManagement::InitializeScene(Scene* scene, SDL_GPUDevice* device)
-{
-	SceneManagement::LoadSceneResources(scene, device);
-}
-
 
 
 Entity* SceneManagement::CreateEntity(Scene* scene)
@@ -125,10 +119,14 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPas
 			//draw this entity
 			if (currentEntity.renderable)
 			{
+				mfg::mat4 model = mfg::mat4(1.f);
 				mfg::mat4 translate = mfg::Translate(currentEntity.position);
 				mfg::mat4 scale = mfg::Scale(currentEntity.scale);
-				mfg::mat4 model = mfg::mul(translate, scale); //FIXME
 
+				model = mfg::mul(model, translate);
+				model = mfg::mul(model, scale);
+
+				model = mfg::mat4(1.f);
 
 				//FIXME: the view matrix should be pulled from a camera of some kind
 				mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
@@ -177,7 +175,7 @@ void SceneManagement::DrawEntity(SDL_GPURenderPass* renderPass, const Entity& en
 
 	if (handle.gfxInitialized)
 	{
-		SDL_DrawGPUIndexedPrimitives(renderPass, handle.indexSize, 1, handle.indexOffset, handle.vertexOffset, 0);
+		SDL_DrawGPUIndexedPrimitives(renderPass, handle.indexSize / sizeof(uint32_t), 1, handle.indexOffset, handle.vertexOffset, 0);
 	}
 }
 
@@ -210,10 +208,8 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 }
 
 
-void SceneManagement::LoadSceneResources(Scene* scene, SDL_GPUDevice* device)
+void SceneManagement::LoadSceneResources(Scene* scene, SDL_GPUCommandBuffer* cmd)
 {
-	SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device);
-
 	//TODO: resource Management
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{

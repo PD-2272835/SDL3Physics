@@ -184,9 +184,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
 	//indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
-
-	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
-
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
@@ -194,7 +191,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->renderable = true;
 	entity->hasGravity = true;
 
-	SceneManagement::LoadSceneResources(mainScene, device);
+	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
+
+
+	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
 
 
 	return SDL_APP_CONTINUE;
@@ -245,10 +245,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	depthInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
 	depthInfo.clear_depth = 1.0f;
 	
-	uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
-	uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
-	uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
-	SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
+	//uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
+	//uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
+	//uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
+	//SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
 	//Draw Stuff (within render pass)
 	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);

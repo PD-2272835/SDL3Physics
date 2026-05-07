@@ -43,7 +43,6 @@ struct Scene
 namespace SceneManagement
 {
 	Scene* CreateScene(SDL_GPUDevice* device);
-	void InitializeScene(Scene* scene, SDL_GPUDevice* device);
 	void DeleteScene(Scene* scene);
 
 	Entity* CreateEntity(Scene* scene);
@@ -56,7 +55,7 @@ namespace SceneManagement
 	void DrawScene(SDL_GPURenderPass* renderPass, Scene* scene);
 	
 	void LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cmd, const Entity &entity);
-	void LoadSceneResources(Scene* scene, SDL_GPUDevice* device); //Load all required assets from a scene into assetManagement
+	void LoadSceneResources(Scene* scene, SDL_GPUCommandBuffer* cmd); //Load all required assets from a scene into assetManagement
 
 	//FIXME: better to return a dynamically allocated scene instance instead of operating on an existing scene
 	bool LoadSceneFromFile(Scene &scene);
