@@ -200,12 +200,12 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 		uploadCheck |= scene->vertexBuffer.UploadData(cmd, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
 
 		handle.indexOffset = scene->indexBuffer.End;
-		handle.indexSize = mesh->Indices.size();
-		uploadCheck |= scene->indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize * sizeof(uint32_t), handle.indexOffset);
+		handle.indexSize = mesh->Indices.size() * sizeof(uint32_t);
+		uploadCheck |= scene->indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize, handle.indexOffset);
 
 		handle.gfxInitialized = uploadCheck;
 
-		mesh->handle = handle;
+		ref.get()->handle = handle;
 	}
 }
 

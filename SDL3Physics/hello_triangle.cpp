@@ -294,9 +294,9 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
 	std::cout << std::endl;
+	SceneManagement::DeleteScene(mainScene);
 	SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline);
 	vertexStorageBuffer.Delete();
-	SceneManagement::DeleteScene(mainScene);
 	SDL_ReleaseGPUTexture(device, depthTexture);
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);

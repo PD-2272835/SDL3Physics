@@ -13,39 +13,42 @@ AssetManagement *AssetManagement::GetInstance()
 	return pInstance_;
 }
 
-
-std::shared_ptr<Asset> AssetManagement::GetAsset(const char* AssetPath)
+//cient on youtube: https://youtu.be/qGqCE2divWU?t=247
+std::shared_ptr<Asset> AssetManagement::GetAsset(const std::string& AssetPath)
 {
 	auto iterator = mAssets.find(AssetPath);
-	std::shared_ptr<Asset> res;
+
+	//Asset is already loaded
 	if (iterator != mAssets.end())
 	{
-		if (res = iterator->second.lock())
+		if (std::shared_ptr<Asset> res = iterator->second.lock())
 		{
-			return res; //Asset is already loaded
+			return res;
 		}
 	}
+	std::cout << "Loading Asset\n";
 
 	//Asset not loaded
-	res = AssetManagement::LoadAsset(AssetPath); //create new entry/update Asset Entry
+	std::shared_ptr<Asset> res = AssetManagement::LoadAsset(AssetPath); //create new entry/update Asset Entry
 	mAssets[AssetPath] = res;
 	return res;
 }
 
 //this assumes a relative filepath
-std::shared_ptr<Asset> AssetManagement::LoadAsset(const char* AssetPath)
+std::shared_ptr<Asset> AssetManagement::LoadAsset(const std::string& AssetPath)
 {
 	//get the file extension
 	std::filesystem::path p(AssetPath);
 	if (std::filesystem::exists(AssetPath) && p.has_extension())
 	{
+		std::cout << p.extension() << "\n";
 		if (p.extension() == ".png")
 		{
 			//TODO: load image/texture
 
 		}
 		else if (p.extension() == ".obj") {
-			return LoadObj(AssetPath);
+			return LoadObj(AssetPath.c_str());
 		}
 	}
 

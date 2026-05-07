@@ -4,6 +4,7 @@
 #include <map>
 #include <filesystem>
 #include <mutex>
+#include <string>
 
 #include "AssetTypes.hpp"
 #include "AssetLoaders.hpp"
@@ -22,10 +23,10 @@ public:
 	void operator=(const AssetManagement&) = delete;
 	static AssetManagement* GetInstance();
 
-	std::map<const char*, std::weak_ptr<Asset>> mAssets; //resource management idea from "cient" on youtube: https://www.youtube.com/watch?v=qGqCE2divWU
+	std::map<std::string, std::weak_ptr<Asset>> mAssets; //resource management idea from "cient" on youtube: https://www.youtube.com/watch?v=qGqCE2divWU
 
-	std::shared_ptr<Asset> GetAsset(const char* AssetPath);
-	std::shared_ptr<Asset> LoadAsset(const char* AssetPath);
+	std::shared_ptr<Asset> GetAsset(const std::string& AssetPath);
+	std::shared_ptr<Asset> LoadAsset(const std::string& AssetPath);
 
 };
 
