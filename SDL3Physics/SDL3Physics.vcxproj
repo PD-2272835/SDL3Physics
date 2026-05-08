@@ -159,6 +159,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="AssetLoaders.cpp" />
     <ClCompile Include="AssetManagement.cpp" />
     <ClCompile Include="AssetTypes.hpp" />
@@ -174,6 +175,7 @@
     <None Include="shaderSource\default_vert.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.hpp" />
     <ClInclude Include="AssetLoaders.hpp" />
     <ClInclude Include="AssetManagement.hpp" />
     <ClInclude Include="Buffer.hpp" />

@@ -44,16 +44,6 @@ const static Uint16 quadIndices[]
 	2, 1, 3
 };
 
-
-/*struct UniformBuffer
-{
-	mfg::mat4 View;
-	mfg::mat4 Model;
-	float time;
-};*/
-
-static UniformBuffer uniformData{};
-
 //AppInit is called at the very start of program execution
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 {
@@ -162,26 +152,21 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
 
 
-	graphicsPipeline = SDL_CreateGPUGraphicsPipeline(device, &pipelineInfo);
+	Application::GetInstance()->GFXPipeline = SDL_CreateGPUGraphicsPipeline(device, &pipelineInfo);
 
 	vertexShader.Delete();
 	fragmentShader.Delete();
 
-	//auto something = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj").get();
-
-	//model = LoadObj("C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj");
-
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
-	
-	//vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
-	vertexStorageBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
-	
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-	//vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
-	
-	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.3f, 1000.f) };
-	vertexStorageBuffer.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
+	Application::GetInstance()->vSSBO = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
+	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.3f, 1000.f) };
+	Application::GetInstance()->vSSBO.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
+
+
+	//vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
+	//vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
 	//indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
 	//indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
 
@@ -198,6 +183,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->renderable = true;
 	entity->hasGravity = true;
 
+	entity = SceneManagement::CreateEntity(mainScene);
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
+	entity->name = "blood sacrifice 3";
+	entity->renderable = true;
+	entity->hasGravity = true;
+
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -211,6 +202,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 //AppIterate is called every frame/background update - roughly equivalent to Unity's `Update()` callback
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+	Application* App = Application::GetInstance();
+
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device); //Tell the GPU we want to do something with it
 	
 	SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, window, &swapchainTexture, &Width, &Height);
@@ -223,11 +216,14 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 		return SDL_APP_CONTINUE;
 	}
 	
+
+	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
 	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
 	colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
+
 
 
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
@@ -237,12 +233,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	depthInfo.clear_depth = 1.0f;
 
 
-	//set up the Color Target (RenderTargetSpec)
+	App->colorInfo = colorTargetInfo;
+	App->depthInfo = depthInfo;
 
 	
 
-	//cool stuff?
-	SceneManagement::UpdateEntities(commandBuffer, mainScene, Time.delta);
+	//hopefully this works - worth noting this also handles rendering of the scene
+	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);
 
 
 	//uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
@@ -258,7 +255,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//Anything else we want to do goes below here
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
-	Time.tick();
+	
+	App->Time.tick();
 	return SDL_APP_CONTINUE;
 }
 
@@ -280,10 +278,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 //AppQuit is called upon termination of program execution (usually used to free resources)
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
+	Application* App = Application::GetInstance();
 	std::cout << std::endl;
 	SceneManagement::DeleteScene(mainScene);
-	SDL_ReleaseGPUGraphicsPipeline(device, graphicsPipeline);
-	vertexStorageBuffer.Delete();
+	SDL_ReleaseGPUGraphicsPipeline(device, App->GFXPipeline);
+	App->vSSBO.Delete();
 	SDL_ReleaseGPUTexture(device, depthTexture);
 	SDL_DestroyGPUDevice(device);
 	SDL_DestroyWindow(window);

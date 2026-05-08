@@ -42,7 +42,7 @@ bool Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 	//starting from the user-provided byte offset into this buffer
 	SDL_GPUBufferRegion region{ID, destinationOffset, dataSize};
 
-	SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
+	SDL_UploadToGPUBuffer(copyPass, &location, &region, false);
 	
 	SDL_EndGPUCopyPass(copyPass); //must end pass before
 	SDL_ReleaseGPUTransferBuffer(Device, transfer);

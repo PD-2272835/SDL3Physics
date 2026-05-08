@@ -41,7 +41,7 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const std::string& AssetPath)
 	std::filesystem::path p(AssetPath);
 	if (std::filesystem::exists(AssetPath) && p.has_extension())
 	{
-		std::cout << p.extension() << "\n";
+		std::cout << p.filename() << "\n";
 		if (p.extension() == ".png")
 		{
 			//TODO: load image/texture
