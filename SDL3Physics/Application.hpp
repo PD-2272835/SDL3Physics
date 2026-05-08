@@ -41,6 +41,7 @@ public:
 	Clock Time;
 
 	SDL_GPUColorTargetInfo colorInfo = {};
+	SDL_GPUColorTargetInfo backgroundInfo = {};
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
 
 	Buffer vSSBO; //vertexStorage Buffer

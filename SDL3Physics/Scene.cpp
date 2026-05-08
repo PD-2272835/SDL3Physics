@@ -109,7 +109,7 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 			//draw this entity
 			if (currentEntity.renderable)
 			{
-				SceneManagement::DrawEntity(cmd, scene, currentEntity);
+				SceneManagement::DrawEntity(cmd, scene, currentEntity, (i == 0 ? true : false));
 			}
 
 		}
@@ -126,13 +126,13 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 		Entity entity = scene->entities[i];
 		if (entity.renderable && entity.allocated && entity.enabled)
 		{
-			SceneManagement::DrawEntity(cmd, scene, entity);
+			SceneManagement::DrawEntity(cmd, scene, entity, (i == 0 ? true : false));
 		}
 	}
 }
 
 
-void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity)
+void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity, const bool &isFirst)
 {	
 	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
 
@@ -150,7 +150,22 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const 
 
 
 		//Draw Stuff (within render pass)
-		SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(cmd, &App->colorInfo, 1, NULL);
+
+		SDL_GPUColorTargetInfo* colorInfo = &App->colorInfo;
+		
+
+		//TODO: Fix clear color with background color target
+		/*if (isFirst)
+		{
+			colorInfo = &App->backgroundInfo;
+		}*/
+
+		SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(
+			cmd, 
+			colorInfo,
+			1, 
+			NULL
+		);
 		
 		//bind pipeline to renderpass
 		SDL_BindGPUGraphicsPipeline(renderPass, App->GFXPipeline);

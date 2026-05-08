@@ -172,13 +172,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
-	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
 	entity->renderable = true;
 	entity->hasGravity = true;
 	
 	entity = SceneManagement::CreateEntity(mainScene);
-	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "blood sacrifice 2";
 	entity->renderable = true;
 	entity->hasGravity = true;
@@ -220,6 +220,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
 	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
+	colorTargetInfo.load_op = SDL_GPU_LOADOP_DONT_CARE;
+	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
+	colorTargetInfo.texture = swapchainTexture;
+
+	SDL_GPUColorTargetInfo backgroundTargetInfo{}; //RenderTargetSpec equivalent
+	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
 	colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
@@ -235,8 +241,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	App->colorInfo = colorTargetInfo;
 	App->depthInfo = depthInfo;
+	App->backgroundInfo = backgroundTargetInfo;
 
-	
 
 	//hopefully this works - worth noting this also handles rendering of the scene
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);

@@ -52,7 +52,7 @@ namespace SceneManagement
 	Entity* EntityFromHandle(Scene* scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
 	void UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta); //Update all entities in provided scene
 	
-	void DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity);
+	void DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity, const bool &isFirst);
 	void DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene);
 	
 	void LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cmd, const Entity &entity);
