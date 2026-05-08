@@ -7,10 +7,10 @@
 
 struct GFXHandle
 {
-	uint32_t vertexOffset = 0;
-	uint32_t vertexSize = 0;
-	uint32_t indexOffset = 0;
-	uint32_t indexSize = 0;
+	uint32_t vertexOffset = 0;	//size of offset into vertex buffer in bytes
+	uint32_t vertexSize = 0;	//size of vertex buffer data in bytes
+	uint32_t indexOffset = 0;	//size of offset into index buffer in bytes
+	uint32_t indexSize = 0;		//size of the index data in bytes
 	bool gfxInitialized = false; //has this resource been loaded onto the GPU
 	//THIS DOES NOT YET MANAGE TEXTURES
 };
@@ -27,7 +27,7 @@ struct Vertex
 	mfg::vec3 Normal;
 	mfg::vec2 UV;
 
-	Vertex();
+	Vertex() : Position({}), Normal({}), UV({}) {};
 	Vertex(mfg::vec3 position, mfg::vec3 normal, mfg::vec2 uv)
 		: Position(position), Normal(normal), UV(uv)
 	{};

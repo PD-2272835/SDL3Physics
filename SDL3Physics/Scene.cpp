@@ -80,18 +80,8 @@ void SceneManagement::DestroyEntity(Scene* scene, const EntityHandle& entityHand
 }
 
 //this should run each frame
-void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, double timeDelta)
+void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta)
 {
-	SDL_GPUBufferBinding vertexBindings[1];
-	vertexBindings[0].buffer = scene->vertexBuffer.ID;
-	vertexBindings[0].offset = 0;
-
-	SDL_GPUBufferBinding indexBindings[1];
-	indexBindings[0].buffer = scene->indexBuffer.ID;
-	indexBindings[0].offset = 0;
-
-	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
-	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{
@@ -127,6 +117,10 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPas
 				model = mfg::mul(model, scale);
 
 				model = mfg::mat4(1.f);
+				if (i == 1)
+				{
+					model = mfg::mat4(2.f);
+				}
 
 				//FIXME: the view matrix should be pulled from a camera of some kind
 				mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
@@ -134,7 +128,7 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPas
 				UniformBuffer uniformData = { view, model, timeDelta };
 
 				SDL_PushGPUVertexUniformData(cmd, 0, &uniformData, sizeof(uniformData));
-				SceneManagement::DrawEntity(renderPass, currentEntity);
+				SceneManagement::DrawEntity(cmd, currentEntity);
 			}
 
 		}
@@ -169,14 +163,37 @@ void SceneManagement::DrawScene(SDL_GPURenderPass* renderPass, Scene* scene)
 }
 
 
-void SceneManagement::DrawEntity(SDL_GPURenderPass* renderPass, const Entity& entity)
-{
-	GFXHandle handle = AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
+void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity)
+{	
+	SDL_GPUBufferBinding vertexBindings[1];
+	vertexBindings[0].buffer = scene->vertexBuffer.ID;
+	vertexBindings[0].offset = 0;
 
-	if (handle.gfxInitialized)
+	SDL_GPUBufferBinding indexBindings[1];
+	indexBindings[0].buffer = scene->indexBuffer.ID;
+	indexBindings[0].offset = 0;
+
+
+	//Draw Stuff (within render pass)
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(cmd, &colorTargetInfo, 1, NULL);
+
+	//bind pipeline to renderpass
+	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
+
+	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
+
+
+	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+
+	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
+
+	if (handle->gfxInitialized)
 	{
-		SDL_DrawGPUIndexedPrimitives(renderPass, handle.indexSize / sizeof(uint32_t), 1, handle.indexOffset, handle.vertexOffset, 0);
+		SDL_DrawGPUIndexedPrimitives(renderPass, handle->indexSize, 1, handle->indexOffset, handle->vertexOffset, 0);
 	}
+
+	SDL_EndGPURenderPass(renderPass);
 }
 
 
@@ -196,6 +213,7 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 		handle.vertexOffset = scene->vertexBuffer.End;
 		handle.vertexSize = mesh->Vertices.size() * sizeof(Vertex);
 		uploadCheck |= scene->vertexBuffer.UploadData(cmd, (void*)mesh->Vertices.data(), handle.vertexSize, handle.vertexOffset);
+
 
 		handle.indexOffset = scene->indexBuffer.End;
 		handle.indexSize = mesh->Indices.size() * sizeof(uint32_t);

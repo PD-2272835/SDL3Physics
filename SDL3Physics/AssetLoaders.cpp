@@ -147,6 +147,6 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 
 Asset LoadTexture(const char* path)
 {
-	Texture r;
+	Asset r;
 	return r;
 }

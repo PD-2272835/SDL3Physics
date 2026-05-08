@@ -15,6 +15,7 @@
 #include "Entity.hpp"
 #include "AssetManagement.hpp"
 #include "Scene.hpp"
+#include "Application.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -190,6 +191,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->name = "blood sacrifice";
 	entity->renderable = true;
 	entity->hasGravity = true;
+	
+	entity = SceneManagement::CreateEntity(mainScene);
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
+	entity->name = "blood sacrifice 2";
+	entity->renderable = true;
+	entity->hasGravity = true;
+
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -199,21 +207,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	return SDL_APP_CONTINUE;
 }
-
-//https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
-struct Clock
-{
-	uint32_t last_tick_time = 0;
-	uint32_t delta = 0;
-
-	void tick()
-	{
-		uint32_t tick_time = SDL_GetTicks();
-		delta = tick_time - last_tick_time;
-		last_tick_time = tick_time;
-	}
-};
-Clock Time;
 
 //AppIterate is called every frame/background update - roughly equivalent to Unity's `Update()` callback
 SDL_AppResult SDL_AppIterate(void *appstate)
@@ -230,44 +223,38 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 		return SDL_APP_CONTINUE;
 	}
 	
-
-	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
 	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
 	colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
-	
-	
+
+
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
 	depthInfo.texture = depthTexture;
 	depthInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	depthInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
 	depthInfo.clear_depth = 1.0f;
+
+
+	//set up the Color Target (RenderTargetSpec)
+
 	
+
+	//cool stuff?
+	SceneManagement::UpdateEntities(commandBuffer, mainScene, Time.delta);
+
+
 	//uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
 	//uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
 	//uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
 	//SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
 
-	//Draw Stuff (within render pass)
-	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, &colorTargetInfo, 1, NULL);
-
-	//bind pipeline to renderpass
-	SDL_BindGPUGraphicsPipeline(renderPass, graphicsPipeline);
-
-	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &vertexStorageBuffer.ID, 1); // "slot" corresponds to "binding" in the shader
-
-	//cool stuff?
-	SceneManagement::UpdateEntities(commandBuffer, renderPass, mainScene, Time.delta);
-
-
-
 	//DRAW COMMAND!!
 	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
 	//SDL_DrawGPUIndexedPrimitives(renderPass, model->Indices.size(), 1, 0, 0, 0);
 
-	SDL_EndGPURenderPass(renderPass);
+
 	//Anything else we want to do goes below here
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer

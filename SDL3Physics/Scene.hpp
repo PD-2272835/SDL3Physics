@@ -5,6 +5,7 @@
 #include "Entity.hpp"
 #include "Buffer.hpp"
 #include "AssetManagement.hpp" //includes std::vector
+#include "Application.hpp"
 
 
 #define MAX_ENTITIES 1024
@@ -28,7 +29,7 @@ struct Scene
 	Entity* entities = new Entity[MAX_ENTITIES]{}; //array of entities of size defined by maxEntities
 	size_t maxEntities = MAX_ENTITIES;
 	Entity zero_entity = {}; //entity to allow operations to gracefully fail
-	float gravityStrength = 9.8;
+	float gravityStrength = 9.8f;
 
 	//track buffers in scene struct
 	Buffer vertexBuffer;
@@ -49,9 +50,9 @@ namespace SceneManagement
 	void DestroyEntity(Scene* scene, const EntityHandle &entityHandle);
 
 	Entity* EntityFromHandle(Scene* scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
-	void UpdateEntities(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, double timeDelta); //Update all entities in provided scene
+	void UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta); //Update all entities in provided scene
 	
-	void DrawEntity(SDL_GPURenderPass* renderPass, const Entity& entity);
+	void DrawEntity(SDL_GPUCommandBuffer* cmd, const Entity& entity);
 	void DrawScene(SDL_GPURenderPass* renderPass, Scene* scene);
 	
 	void LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cmd, const Entity &entity);
