@@ -79,6 +79,7 @@ void SceneManagement::DestroyEntity(Scene* scene, const EntityHandle& entityHand
 	*entity = {};
 }
 
+
 //this should run each frame
 void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta)
 {
@@ -109,7 +110,8 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 			//draw this entity
 			if (currentEntity.renderable)
 			{
-				SceneManagement::DrawEntity(cmd, scene, currentEntity, (i == 0 ? true : false));
+				//realistically rendering should happen within this loop, 
+				//as this would prevent looping over every object in the scene twice
 			}
 
 		}
@@ -120,81 +122,73 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 //Possibly use this to decouple entity updates from entity drawing
 void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 {
+	Application* App = Application::GetInstance();
+
+	SDL_GPUBufferBinding vertexBindings[1];
+	vertexBindings[0].buffer = scene->vertexBuffer.ID;
+	vertexBindings[0].offset = 0;
+
+	SDL_GPUBufferBinding indexBindings[1];
+	indexBindings[0].buffer = scene->indexBuffer.ID;
+	indexBindings[0].offset = 0;
+
+
+	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(
+		cmd,
+		&App->colorInfo,
+		1,
+		&App->depthInfo
+	);
+
+	//bind pipeline to renderpass
+	SDL_BindGPUGraphicsPipeline(renderPass, App->GFXPipeline);
+
+	//bind all the scene's buffers
+	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &App->vSSBO.ID, 1); // "slot" corresponds to "binding" in the shader
+	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
+	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+
 
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{
 		Entity entity = scene->entities[i];
 		if (entity.renderable && entity.allocated && entity.enabled)
 		{
-			SceneManagement::DrawEntity(cmd, scene, entity, (i == 0 ? true : false));
+			SceneManagement::DrawEntity(cmd, renderPass, scene, entity);
 		}
 	}
+
+	SDL_EndGPURenderPass(renderPass);
 }
 
 
-void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, Scene* scene, const Entity& entity, const bool &isFirst)
+void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, const Entity& entity)
 {	
 	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
 
 	if (handle->gfxInitialized)
 	{
-		Application* App = Application::GetInstance();
-
-		SDL_GPUBufferBinding vertexBindings[1];
-		vertexBindings[0].buffer = scene->vertexBuffer.ID;
-		vertexBindings[0].offset = 0;
-
-		SDL_GPUBufferBinding indexBindings[1];
-		indexBindings[0].buffer = scene->indexBuffer.ID;
-		indexBindings[0].offset = 0;
-
-
-		//Draw Stuff (within render pass)
-
-		SDL_GPUColorTargetInfo* colorInfo = &App->colorInfo;
-		
-
-		//TODO: Fix clear color with background color target
-		/*if (isFirst)
-		{
-			colorInfo = &App->backgroundInfo;
-		}*/
-
-		SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(
-			cmd, 
-			colorInfo,
-			1, 
-			NULL
-		);
-		
-		//bind pipeline to renderpass
-		SDL_BindGPUGraphicsPipeline(renderPass, App->GFXPipeline);
-
-		SDL_BindGPUVertexStorageBuffers(renderPass, 0, &App->vSSBO.ID, 1); // "slot" corresponds to "binding" in the shader
-		SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
-		SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-
 		//push UniformData
-		mfg::mat4 model = mfg::mat4(1.f);
+		/*mfg::mat4 model = mfg::mat4(1.f);
 		mfg::mat4 translate = mfg::Translate(entity.position);
 		mfg::mat4 scale = mfg::Scale(entity.scale);
 
 		model = mfg::mul(model, translate);
-		model = mfg::mul(model, scale);
-
-		model = mfg::mat4(1.f);
+		model = mfg::mul(model, scale);*/
+		//TODO: fix matrix multiplication
+		mfg::mat4 model = mfg::mat4(1.f);
 
 		//FIXME: the view matrix should be pulled from a camera of some kind (should probably be in the application global state)
-		mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
+		mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(-2.f, 0.f, 5.f));
 		//update push constants so that this entity is rendered with it's transformation parameters
-		UniformBuffer uniformData = { view, model, App->Time.delta };
+		UniformBuffer uniformData = { view, model, Application::GetInstance()->Time.delta};
 
+		//Update the uniform data used to render this Entity
+		//TODO: Move this to be pulled from a storage buffer that's filled by UpdateEntities()
 		SDL_PushGPUVertexUniformData(cmd, 0, &uniformData, sizeof(uniformData));
-		SDL_PushGPUVertexUniformData(cmd, 0, &uniformData, sizeof(uniformData));
 
-
+		//Draw this Entity
 		SDL_DrawGPUIndexedPrimitives(renderPass, handle->indexSize, 1, handle->indexOffset, handle->vertexOffset, 0);
-		SDL_EndGPURenderPass(renderPass);
 	}
 
 }

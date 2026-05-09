@@ -5,7 +5,7 @@
 #define SDL_HINT_RENDER_VULKAN_DEBUG 1
 
 //use the expanded SDL_GPUShaderFormat flags, this macro just allows formats to be changed more easily
-#define PLATFORM_TARGET_TYPE (1u << 1)
+#define PLATFORM_TARGET_TYPE (1u << 1) | (1u << 0)
 
 #include <SDL3\SDL_main.h>
 #include <SDL3\SDL.h>
@@ -123,12 +123,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//depth stencil state
 
 	//depth testing
-	/*
-	if (SDL_GPUTextureSupportsFormat(device, SDL_GPU_TEXTUREFORMAT_D16_UNORM, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET))
-	{
-		std::cout << "yes\n";
-	}
-	const SDL_GPUTextureFormat depthFormat = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
+	
+	const SDL_GPUTextureFormat depthFormat = SDL_GPUTextureSupportsFormat(device, 
+		SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET) 
+		? SDL_GPU_TEXTUREFORMAT_D32_FLOAT : SDL_GPU_TEXTUREFORMAT_D16_UNORM; //use float if supported
 	
 	SDL_GPUTextureCreateInfo depthTexInfo = {};
 	depthTexInfo.type = SDL_GPU_TEXTURETYPE_2D;
@@ -146,7 +144,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	pipelineInfo.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
 	pipelineInfo.target_info.depth_stencil_format = depthFormat;
 	pipelineInfo.target_info.has_depth_stencil_target = true;
-	*/
+	
 	//output buffers
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
@@ -165,18 +163,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Application::GetInstance()->vSSBO.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
 
-	//vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, model->Vertices.size() * sizeof(Vertex));
-	//vertexBuffer.UploadData(commandBuffer, (void*)model->Vertices.data(), model->Vertices.size() * sizeof(Vertex), 0);
-	//indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, model->Indices.size() * sizeof(uint32_t));
-	//indexBuffer.UploadData(commandBuffer, (void*)model->Indices.data(), model->Indices.size() * sizeof(uint32_t), 0);
-
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
 	entity->renderable = true;
 	entity->hasGravity = true;
-	
+
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "blood sacrifice 2";
@@ -188,7 +181,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->name = "blood sacrifice 3";
 	entity->renderable = true;
 	entity->hasGravity = true;
-
+	
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -220,16 +213,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//set up the Color Target (RenderTargetSpec)
 	SDL_GPUColorTargetInfo colorTargetInfo{}; //RenderTargetSpec equivalent
 	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
-	colorTargetInfo.load_op = SDL_GPU_LOADOP_DONT_CARE;
-	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
-	colorTargetInfo.texture = swapchainTexture;
-
-	SDL_GPUColorTargetInfo backgroundTargetInfo{}; //RenderTargetSpec equivalent
-	colorTargetInfo.clear_color = { 240 / 255.f, 240 / 255.f, 240 / 255.f, 255 / 255.f }; //convert 0-255 colour values to a value from 0-1
 	colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
 	colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
 	colorTargetInfo.texture = swapchainTexture;
-
 
 
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
@@ -241,28 +227,17 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	App->colorInfo = colorTargetInfo;
 	App->depthInfo = depthInfo;
-	App->backgroundInfo = backgroundTargetInfo;
-
 
 	//hopefully this works - worth noting this also handles rendering of the scene
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);
-
-
-	//uniformData.time = SDL_GetTicksNS() / 1e9f; //fill uniform
-	//uniformData.Model = mfg::Rotate(1.f*uniformData.time, mfg::vec3(0, 1, 0));
-	//uniformData.View = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(0.f, -1.f, -10.f));
-	//SDL_PushGPUVertexUniformData(commandBuffer, 0, &uniformData, sizeof(uniformData)); //submit uniform
-
-	//DRAW COMMAND!!
-	//SDL_DrawGPUPrimitives(renderPass, 3, 1, 0, 0);
-	//SDL_DrawGPUIndexedPrimitives(renderPass, model->Indices.size(), 1, 0, 0, 0);
+	SceneManagement::DrawScene(commandBuffer, mainScene);
 
 
 	//Anything else we want to do goes below here
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
 	
-	App->Time.tick();
+	App->Time.tick(); //Update application clock
 	return SDL_APP_CONTINUE;
 }
 
