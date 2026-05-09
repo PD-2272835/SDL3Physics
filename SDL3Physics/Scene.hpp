@@ -7,6 +7,7 @@
 #include "AssetManagement.hpp" //includes std::vector
 #include "Application.hpp"
 #include "matrix.hpp"
+#include "functions.hpp"
 #define MAX_ENTITIES 1024
 
 

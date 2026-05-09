@@ -167,9 +167,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
+	entity->position = mfg::vec3(1.f, 2.f, 3.f);
+	entity->scale = mfg::vec3(10.f);
 	entity->renderable = true;
 	entity->hasGravity = true;
-
+/*
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "blood sacrifice 2";
@@ -181,7 +183,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->name = "blood sacrifice 3";
 	entity->renderable = true;
 	entity->hasGravity = true;
-	
+	*/
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 

@@ -83,8 +83,9 @@ void bvh::BottomUpConstruction(std::vector<AABB> boxes)
 
 //the following Top Down BVH construction is heavily adapted from Matthias at 10-minute physics
 //https://github.com/matthias-research/pages/blob/master/tenMinutePhysics/24-morton.html#L80
+//The original is written in JavaScript
 
-//expand a given coordinate so it can be used to interleave bits by "inserting" two zeros after
+//expand a given coordinate so it can be used to interleave bits by "inserting" two zeros between each bit
 //https://fgiesen.wordpress.com/2022/09/09/morton-codes-addendum/
 uint64_t BitExpansion(uint64_t x)
 {
@@ -106,7 +107,7 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 	y = (y + worldSize / 2) / worldSize;
 	z = (z + worldSize / 2) / worldSize;
 
-	//ensure this is the case - not needed?
+	//ensure this is the case before bit expansion
 	x = mfg::Clamp(x);
 	y = mfg::Clamp(y);
 	z = mfg::Clamp(z);
@@ -124,6 +125,7 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 }
 
 
+//Create a BVH subtree from index into Nodes vector
 size_t bvh::CreateTopDownSubtree(size_t begin, size_t end)
 {
 	if (begin == end)
@@ -144,6 +146,7 @@ size_t bvh::CreateTopDownSubtree(size_t begin, size_t end)
 	}
 }
 
+//construct an AABB BVH tree from a list of AABBs
 void bvh::TopDownConstruction(std::vector<AABB> boxes)
 {
 	for (size_t i = 0; i < boxes.size(); ++i)
@@ -160,7 +163,7 @@ void bvh::TopDownConstruction(std::vector<AABB> boxes)
 	
 	//sort the nodes array by morton code (better spacial locality/cache friendliness)
 	std::sort(nodes.begin(), nodes.end(), 
-		[](const BVHNode& a, const BVHNode& b) 
+		[](const BVHNode& a, const BVHNode& b) //sort lambda
 		{return a.object < b.object; });
 
 	rootNodeIndex = CreateTopDownSubtree(0, nodes.size()); //recursively generate the tree structure and get the index of the root node

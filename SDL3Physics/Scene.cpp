@@ -169,14 +169,13 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 	if (handle->gfxInitialized)
 	{
 		//push UniformData
-		/*mfg::mat4 model = mfg::mat4(1.f);
+		mfg::mat4 model = mfg::mat4(1.f);
 		mfg::mat4 translate = mfg::Translate(entity.position);
 		mfg::mat4 scale = mfg::Scale(entity.scale);
 
 		model = mfg::mul(model, translate);
-		model = mfg::mul(model, scale);*/
-		//TODO: fix matrix multiplication
-		mfg::mat4 model = mfg::mat4(1.f);
+		model = mfg::mul(model, scale);
+
 
 		//FIXME: the view matrix should be pulled from a camera of some kind (should probably be in the application global state)
 		mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(-2.f, 0.f, 5.f));
