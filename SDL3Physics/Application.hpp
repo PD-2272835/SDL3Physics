@@ -5,6 +5,7 @@
 #include <SDL3/SDL_timer.h> //clock
 #include <mutex>
 #include "Buffer.hpp"
+#include "Camera.hpp"
 
 
 //https://gamedev.stackexchange.com/questions/110825/how-to-calculate-delta-time-with-sdl
@@ -12,12 +13,12 @@ struct Clock
 {
 	uint32_t last_tick_time = 0;
 	double delta = 0;
-
+	float timeScale = 1.f;
 
 	void tick()
 	{
 		uint32_t tick_time = SDL_GetTicks();
-		delta = (tick_time - last_tick_time) / 1000.;
+		delta = ((tick_time - last_tick_time) / 1000.) * timeScale;
 		last_tick_time = tick_time;
 	}
 };
@@ -40,6 +41,7 @@ public:
 
 	SDL_GPUGraphicsPipeline* GFXPipeline;
 	Clock Time;
+	Camera mainCamera;
 
 	SDL_GPUColorTargetInfo colorInfo = {};
 	SDL_GPUColorTargetInfo backgroundInfo = {};

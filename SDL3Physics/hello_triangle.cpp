@@ -166,11 +166,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
-	entity->position = mfg::vec3(1.f, 50.f, 3.f);
+	entity->position = mfg::vec3(1.f, 80.f, 3.f);
 	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasGravity = true;
 	entity->hasPhysics = true;
+
 /*
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
@@ -220,6 +221,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	colorTargetInfo.texture = swapchainTexture;
 
 
+
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
 	depthInfo.texture = depthTexture;
 	depthInfo.load_op = SDL_GPU_LOADOP_CLEAR;
@@ -240,6 +242,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
 	
+	SDL_ReleaseGPUTexture(device, swapchainTexture);
 	App->Time.tick(); //Update application clock
 	return SDL_APP_CONTINUE;
 }

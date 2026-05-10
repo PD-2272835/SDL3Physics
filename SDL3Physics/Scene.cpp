@@ -90,7 +90,7 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 		if (currentEntity->allocated && currentEntity->enabled) //only process allocated/active entities
 		{
 			//this null check may not work as expected debug mode does some BS
-			if (currentEntity->Update != nullptr) currentEntity->Update(); //process the update callback for 
+			if (currentEntity->Update != nullptr) currentEntity->Update(currentEntity); //process the update callback for 
 
 			//do collision stuff here
 
@@ -100,7 +100,7 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 			{
 				if (currentEntity->hasGravity)
 				{
-					currentEntity->acceleration = mfg::vec3(0, -scene->gravityStrength, 0);
+					currentEntity->acceleration += mfg::vec3(0, -scene->gravityStrength, 0);
 					//std::cout << timeDelta << " " << mfg::VecToString(currentEntity.acceleration) << "\n";
 				}
 				currentEntity->velocity += currentEntity->acceleration * timeDelta;

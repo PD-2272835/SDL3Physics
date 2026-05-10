@@ -43,8 +43,9 @@ typedef struct Entity
 	bool enabled = false;		//should we skip updating this object?
 	bool allocated = false;		//this should also skip the traversal, used to allocate new objects
 
-	void (*Start)() = nullptr;
-	void (*Update)() = nullptr;
+	void (*Start)(Entity* context) = nullptr;
+	void (*Update)(Entity* context) = nullptr;
+	void (*Destroy)(Entity* context) = nullptr; //allow object scripts to deallocate dynamic resources
 };
 
 
