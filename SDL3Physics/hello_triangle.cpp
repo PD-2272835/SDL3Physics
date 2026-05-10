@@ -124,19 +124,18 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	//depth testing
 	
-	const SDL_GPUTextureFormat depthFormat = SDL_GPUTextureSupportsFormat(device, 
+	const SDL_GPUTextureFormat depthFormat = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
+		/*SDL_GPUTextureSupportsFormat(device,
 		SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET) 
 		? SDL_GPU_TEXTUREFORMAT_D32_FLOAT : SDL_GPU_TEXTUREFORMAT_D16_UNORM; //use float if supported
-	
+	*/
 	SDL_GPUTextureCreateInfo depthTexInfo = {};
-	depthTexInfo.type = SDL_GPU_TEXTURETYPE_2D;
 	depthTexInfo.format = depthFormat;
 	depthTexInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
 	depthTexInfo.width = Width;
 	depthTexInfo.height = Height;
 	depthTexInfo.layer_count_or_depth = 1;
 	depthTexInfo.num_levels = 1;
-	depthTexInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 	depthTexture = SDL_CreateGPUTexture(device, &depthTexInfo);
 	
 	pipelineInfo.depth_stencil_state.enable_depth_test = true;
@@ -167,10 +166,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
-	entity->position = mfg::vec3(1.f, 2.f, 3.f);
-	entity->scale = mfg::vec3(10.f);
+	entity->position = mfg::vec3(1.f, 50.f, 3.f);
+	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasGravity = true;
+	entity->hasPhysics = true;
 /*
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
@@ -229,6 +229,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	App->colorInfo = colorTargetInfo;
 	App->depthInfo = depthInfo;
+	std::cout << App->Time.delta;
 
 	//hopefully this works - worth noting this also handles rendering of the scene
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);

@@ -86,34 +86,35 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 	//iterate through all entities
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{
-		Entity currentEntity = scene->entities[i];
-		if (currentEntity.allocated && currentEntity.enabled) //only process allocated/active entities
+		Entity* currentEntity = &scene->entities[i];
+		if (currentEntity->allocated && currentEntity->enabled) //only process allocated/active entities
 		{
 			//this null check may not work as expected debug mode does some BS
-			if (currentEntity.Update != nullptr) currentEntity.Update(); //process the update callback for 
+			if (currentEntity->Update != nullptr) currentEntity->Update(); //process the update callback for 
 
 			//do collision stuff here
 
 
 			//account for mass?
-			if (currentEntity.hasPhysics)
+			if (currentEntity->hasPhysics)
 			{
-				if (currentEntity.hasGravity)
+				if (currentEntity->hasGravity)
 				{
-					currentEntity.acceleration += mfg::vec3(0, -scene->gravityStrength/timeDelta, 0);
+					currentEntity->acceleration = mfg::vec3(0, -scene->gravityStrength, 0);
+					//std::cout << timeDelta << " " << mfg::VecToString(currentEntity.acceleration) << "\n";
 				}
-				currentEntity.velocity += currentEntity.acceleration * timeDelta;
-				currentEntity.position += currentEntity.velocity * timeDelta;
-				currentEntity.acceleration = 0;
+				currentEntity->velocity += currentEntity->acceleration * timeDelta;
+				currentEntity->position += currentEntity->velocity * timeDelta;
+				currentEntity->acceleration = 0;
 			}
 
 			//draw this entity
-			if (currentEntity.renderable)
+			if (currentEntity->renderable)
 			{
 				//realistically rendering should happen within this loop, 
 				//as this would prevent looping over every object in the scene twice
 			}
-
+			std::cout << mfg::VecToString(currentEntity->position) << "\n";
 		}
 	}
 }
@@ -168,7 +169,7 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 
 	if (handle->gfxInitialized)
 	{
-		//push UniformData
+		//push UniformData 
 		mfg::mat4 model = mfg::mat4(1.f);
 		mfg::mat4 translate = mfg::Translate(entity.position);
 		mfg::mat4 scale = mfg::Scale(entity.scale);
