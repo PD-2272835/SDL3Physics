@@ -163,6 +163,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 
 	mainScene = SceneManagement::CreateScene(device);
+	Entity* camEntity = SceneManagement::CreateEntity(mainScene);
+	Application::GetInstance()->mainCamera = Camera(camEntity);
+
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
@@ -231,7 +234,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	App->colorInfo = colorTargetInfo;
 	App->depthInfo = depthInfo;
-	std::cout << App->Time.delta;
+	//std::cout << App->Time.delta;
 
 	//hopefully this works - worth noting this also handles rendering of the scene
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);
@@ -242,7 +245,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	SDL_SubmitGPUCommandBuffer(commandBuffer); //Do the GPU activity defined in the constructed commandBuffer
 	
-	SDL_ReleaseGPUTexture(device, swapchainTexture);
 	App->Time.tick(); //Update application clock
 	return SDL_APP_CONTINUE;
 }
@@ -258,6 +260,62 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 	{
 		return SDL_APP_SUCCESS;
 	}
+
+	//handle keyboard input
+	if (event->type == SDL_EVENT_KEY_DOWN)
+	{
+		Clock* time = &Application::GetInstance()->Time;
+		Camera* cam = &Application::GetInstance()->mainCamera;
+		switch (event->key.key)
+		{
+		//pause/unpause
+		case SDLK_E:
+			time->timeScale == 1.f ? time->timeScale = 0.f : time->timeScale = 1.f;
+			break;
+		//movement
+		case SDLK_W:
+			cam->ProcessKeyboard(FORWARD, time->delta);
+			break;
+		case SDLK_S:
+			cam->ProcessKeyboard(BACKWARD, time->delta);
+			break;
+		case SDLK_A:
+			cam->ProcessKeyboard(LEFT, time->delta);
+			break;
+		case SDLK_D:
+			cam->ProcessKeyboard(RIGHT, time->delta);
+			break;
+		case SDLK_R:
+			cam->ProcessKeyboard(UP, time->delta);
+			break;
+		case SDLK_F:
+			cam->ProcessKeyboard(DOWN, time->delta);
+			break;
+		default:
+			break;
+		}
+
+	}
+	/*
+	if (event->type == SDL_EVENT_MOUSE_MOTION)
+	{
+
+		SDL_GetMouseState();
+		if (firstMouse)
+		{
+			lastX = xPos;
+			lastY = yPos;
+			firstMouse = false;
+		}
+
+		float xOffset = xPos - lastX;
+		float yOffset = lastY - yPos;
+		lastX = xPos;
+		lastY = yPos;
+
+		Application::GetInstance()->mainCamera.ProcessMouse(xOffset, yOffset);
+	}
+	*/
 
 	return SDL_APP_CONTINUE;
 }

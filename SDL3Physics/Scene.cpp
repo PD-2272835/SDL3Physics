@@ -114,7 +114,7 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, do
 				//realistically rendering should happen within this loop, 
 				//as this would prevent looping over every object in the scene twice
 			}
-			std::cout << mfg::VecToString(currentEntity->position) << "\n";
+			//std::cout << mfg::VecToString(currentEntity->position) << "\n";
 		}
 	}
 }
@@ -177,11 +177,9 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 		model = mfg::mul(model, translate);
 		model = mfg::mul(model, scale);
 
-
-		//FIXME: the view matrix should be pulled from a camera of some kind (should probably be in the application global state)
-		mfg::mat4 view = mfg::View(mfg::vec3(1.f, 0.f, 0.f), mfg::vec3(0.f, 1.f, 0.f), mfg::vec3(0.f, 0.f, 1.f), mfg::vec3(-2.f, 0.f, 5.f));
+		Application* app = Application::GetInstance();
 		//update push constants so that this entity is rendered with it's transformation parameters
-		UniformBuffer uniformData = { view, model, Application::GetInstance()->Time.delta};
+		UniformBuffer uniformData = { app->mainCamera.GetMatrix(), model, app->Time.delta};
 
 		//Update the uniform data used to render this Entity
 		//TODO: Move this to be pulled from a storage buffer that's filled by UpdateEntities()
