@@ -3,7 +3,7 @@
 
 void Camera::ProcessKeyboard(cameraMovement direction, double timeDelta)
 {
-	float velocity = movementSpeed * timeDelta;
+	float velocity = movementSpeed * 0.1f;
 
 	switch (direction)
 	{

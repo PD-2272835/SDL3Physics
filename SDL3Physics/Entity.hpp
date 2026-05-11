@@ -13,6 +13,11 @@ struct EntityHandle //if a reference to an object is stored for a long period of
 	size_t offset; //offset into the scene's entity array
 	uint64_t id;   //unique id
 };
+/*
+struct Velocity
+{
+	mfg::vec3 linear(0.f);
+};*/
 
 
 //MEGASTRUCT - this object holds data synonymous with all entities in the scene, in an attempt at cache friendliness
@@ -30,7 +35,8 @@ typedef struct Entity
 
 	mfg::vec3 position{};
 	mfg::vec3 rotation{}; //change this to a quaternion once quaternions are done
-	mfg::vec3 scale{};
+	mfg::vec3 scale = { 1.f }; //default scale should be 1
+
 
 	mfg::vec3 velocity{};	//physics related data
 	mfg::vec3 acceleration{};

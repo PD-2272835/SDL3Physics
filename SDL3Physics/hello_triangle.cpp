@@ -169,25 +169,27 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "blood sacrifice";
-	entity->position = mfg::vec3(1.f, 80.f, 3.f);
+	entity->position = mfg::vec3(1.f, 2.f, 3.f);
 	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasGravity = true;
 	entity->hasPhysics = true;
 
-/*
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "blood sacrifice 2";
+	entity->position = mfg::vec3(0.f);
+	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
-	entity->hasGravity = true;
 
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
 	entity->name = "blood sacrifice 3";
+	entity->velocity = mfg::vec3(0.f, 30.f, 0.f);
+	entity->position = mfg::vec3(2.f);
 	entity->renderable = true;
+	entity->hasPhysics = true;
 	entity->hasGravity = true;
-	*/
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -270,7 +272,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 		{
 		//pause/unpause
 		case SDLK_E:
-			time->timeScale == 1.f ? time->timeScale = 0.f : time->timeScale = 1.f;
+			time->timeScale >= 1.f ? time->timeScale = 0.f : time->timeScale = 1.f;
 			break;
 		//movement
 		case SDLK_W:
