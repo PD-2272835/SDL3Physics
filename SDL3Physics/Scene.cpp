@@ -172,9 +172,11 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 		//push UniformData 
 		mfg::mat4 model = mfg::mat4(1.f);
 		mfg::mat4 translate = mfg::Translate(entity.position);
+		mfg::mat4 rotate = entity.rotation.ToMatrix();
 		mfg::mat4 scale = mfg::Scale(entity.scale);
 
 		model = mfg::mul(model, translate);
+		model = mfg::mul(model, rotate);
 		model = mfg::mul(model, scale);
 
 		Application* app = Application::GetInstance();
