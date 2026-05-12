@@ -56,7 +56,7 @@ Entity* SceneManagement::CreateEntity(Scene* scene)
 
 
 Entity* SceneManagement::EntityFromHandle(Scene* scene, const EntityHandle &handle) {
-	if (handle.offset < 0 && handle.offset > scene->maxEntities)
+	if (handle.offset < 0 || handle.offset > scene->maxEntities)
 	{
 		return &scene->zero_entity; //return placeholder if handle points outside the entities array
 	}
@@ -76,7 +76,7 @@ Entity* SceneManagement::EntityFromHandle(Scene* scene, const EntityHandle &hand
 void SceneManagement::DestroyEntity(Scene* scene, const EntityHandle& entityHandle)
 {
 	Entity* entity = SceneManagement::EntityFromHandle(scene, entityHandle);
-	*entity = {};
+	*entity = Entity(); //set this Enitity to default state (unallocated and reset)
 }
 
 

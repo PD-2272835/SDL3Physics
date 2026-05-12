@@ -16,6 +16,7 @@
 #include "AssetManagement.hpp"
 #include "Scene.hpp"
 #include "Application.hpp"
+#include "bvh.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -119,8 +120,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	pipelineInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST; //we are drawing triangles
 	//rasterizer state
-	//multisample state
-	//depth stencil state
+	//multisample state (AA)
 
 	//depth testing
 	
@@ -185,7 +185,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
 	entity->name = "blood sacrifice 3";
-	entity->velocity = mfg::vec3(0.f, 30.f, 0.f);
+	entity->velocity = mfg::vec3(0.f, 40.f, 0.f);
 	entity->position = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasPhysics = true;
@@ -276,22 +276,22 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 			break;
 		//movement
 		case SDLK_W:
-			cam->ProcessKeyboard(FORWARD, time->delta);
+			cam->ProcessKeyboard(FORWARD, time->unscaledTimeDelta);
 			break;
 		case SDLK_S:
-			cam->ProcessKeyboard(BACKWARD, time->delta);
+			cam->ProcessKeyboard(BACKWARD, time->unscaledTimeDelta);
 			break;
 		case SDLK_A:
-			cam->ProcessKeyboard(LEFT, time->delta);
+			cam->ProcessKeyboard(LEFT, time->unscaledTimeDelta);
 			break;
 		case SDLK_D:
-			cam->ProcessKeyboard(RIGHT, time->delta);
+			cam->ProcessKeyboard(RIGHT, time->unscaledTimeDelta);
 			break;
 		case SDLK_R:
-			cam->ProcessKeyboard(UP, time->delta);
+			cam->ProcessKeyboard(UP, time->unscaledTimeDelta);
 			break;
 		case SDLK_F:
-			cam->ProcessKeyboard(DOWN, time->delta);
+			cam->ProcessKeyboard(DOWN, time->unscaledTimeDelta);
 			break;
 		default:
 			break;

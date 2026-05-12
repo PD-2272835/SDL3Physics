@@ -13,12 +13,14 @@ struct Clock
 {
 	uint32_t last_tick_time = 0;
 	double delta = 0;
+	double unscaledTimeDelta = 0;
 	float timeScale = 1.f;
 
 	void tick()
 	{
 		uint32_t tick_time = SDL_GetTicks();
-		delta = ((tick_time - last_tick_time) / 1000.) * timeScale;
+		unscaledTimeDelta = (tick_time - last_tick_time) / 1000.;
+		delta = unscaledTimeDelta * timeScale;
 		last_tick_time = tick_time;
 	}
 };

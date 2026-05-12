@@ -27,14 +27,14 @@ struct Velocity
 // -Randy Prime https://gist.github.com/randyprime/065370cfa73c0dd3cb008eb858e6ba4b
 // -TheStackFrame - https://www.youtube.com/watch?v=j8v9O3aFk04
 typedef struct Entity
-{	
+{
 	std::string name;		//optional name of this enitity
 	std::string meshPath; //relative filepath this entities mesh on disk
-	
+
 	EntityHandle selfHandle{};	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
 
 	mfg::vec3 position{};
-	mfg::vec3 rotation{}; //change this to a quaternion once quaternions are done
+	mfg::quat rotation{};
 	mfg::vec3 scale = { 1.f }; //default scale should be 1
 
 
