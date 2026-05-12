@@ -45,6 +45,14 @@ const static Uint16 quadIndices[]
 	2, 1, 3
 };
 
+void Rotator(Entity* entity)
+{
+	mfg::quat someRot = mfg::quat(mfg::vec3(0, 0.5, 0.5), Application::GetInstance()->Time.delta);
+	std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
+	entity->rotation = entity->rotation * someRot;
+}
+
+
 //AppInit is called at the very start of program execution
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 {
@@ -174,6 +182,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->renderable = true;
 	entity->hasGravity = true;
 	entity->hasPhysics = true;
+	entity->Update = &Rotator;
 
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
@@ -181,6 +190,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->position = mfg::vec3(0.f);
 	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
+	entity->Update = &Rotator;
 
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
