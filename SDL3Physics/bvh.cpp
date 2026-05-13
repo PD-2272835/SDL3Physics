@@ -6,7 +6,7 @@ bvh::bvh()
 	worldSize = -1;
 }
 
-bvh::bvh(const std::vector<AABB>& boxes, const size_t worldSize = -1)
+bvh::bvh(const std::vector<AABB> boxes, const size_t worldSize = -1)
 {
 	if (worldSize > -1)
 	{

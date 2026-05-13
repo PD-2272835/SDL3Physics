@@ -37,7 +37,7 @@ class bvh
 	size_t worldSize;
 
 	bvh();
-	bvh(const std::vector<AABB>& boxes, const size_t worldSize);
+	bvh(const std::vector<AABB> boxes, const size_t worldSize);
 
 	//slow, probably don't use
 	void BottomUpConstruction(std::vector<AABB> boxes);

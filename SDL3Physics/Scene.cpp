@@ -83,6 +83,10 @@ void SceneManagement::DestroyEntity(Scene* scene, const EntityHandle& entityHand
 //this should run each frame
 void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta)
 {
+	std::vector<AABB> boxes = scene->colliders;
+
+	//bvh collisionTree(boxes, 100000);
+
 	//iterate through all entities
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{
@@ -163,7 +167,7 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 }
 
 
-void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, const Entity& entity)
+void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, Entity& entity)
 {	
 	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
 
@@ -172,7 +176,7 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 		//push UniformData 
 		mfg::mat4 model = mfg::mat4(1.f);
 		mfg::mat4 translate = mfg::Translate(entity.position);
-		mfg::mat4 rotate = entity.rotation.ToMatrix();
+		mfg::mat4 rotate = entity.rotation.ToMat();
 		
 		//mfg::mat4 rotate = mfg::Rotate(mfg::ToRadians(75), mfg::vec3(0, 1, 0));
 		mfg::mat4 scale = mfg::Scale(entity.scale);
