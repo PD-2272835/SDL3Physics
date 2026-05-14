@@ -19,7 +19,7 @@ enum cameraMovement
 class Camera
 {
 public:
-	float movementSpeed = 100.f;
+	float movementSpeed = 10.f;
 	bool dirty = true;
 
 	Entity* m_entity = nullptr;

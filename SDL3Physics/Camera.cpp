@@ -3,27 +3,30 @@
 
 void Camera::ProcessKeyboard(cameraMovement direction, double timeDelta)
 {
-	float velocity = movementSpeed * timeDelta;
+	float velocity = movementSpeed * 10.f * timeDelta;
 
+	//camera moves counter-intuatively, as it is translating the scene, not itself
+	//eg-camera should look like it moves right, so the scene should be translated left
+	//this is because the projection matrix is used to translate the objects in the scene, not just the camera
 	switch (direction)
 	{
 	case FORWARD:
-		m_entity->position -= front * velocity;
-		break;
-	case BACKWARD:
 		m_entity->position += front * velocity;
 		break;
-	case LEFT:
-		m_entity->position -= right * velocity;
+	case BACKWARD:
+		m_entity->position -= front * velocity;
 		break;
-	case RIGHT:
+	case LEFT:
 		m_entity->position += right * velocity;
 		break;
+	case RIGHT:
+		m_entity->position -= right * velocity;
+		break;
 	case UP:
-		m_entity->position += up * velocity;
+		m_entity->position -= up * velocity;
 		break;
 	case DOWN:
-		m_entity->position -= up * velocity;
+		m_entity->position += up * velocity;
 		break;
 	default:
 		return;
@@ -46,6 +49,7 @@ mfg::mat4 Camera::GetMatrix()
 {
 	if (dirty)
 	{
+		std::cout << "updated view mat\n";
 		viewMat = mfg::View(right, up, front, m_entity->position);
 		dirty = false;
 	}

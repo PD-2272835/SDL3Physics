@@ -47,7 +47,7 @@ const static Uint16 quadIndices[]
 
 void Rotator(Entity* entity)
 {
-	mfg::quat someRot = mfg::quat(mfg::vec3(0, 1, 0), Application::GetInstance()->Time.delta);
+	mfg::quat someRot = mfg::quat(mfg::vec3(0, 0.5, 0.5), Application::GetInstance()->Time.delta);
 	std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
 	entity->rotation = entity->rotation * someRot;
 }
@@ -200,6 +200,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->renderable = true;
 	entity->hasPhysics = true;
 	entity->hasGravity = true;
+	entity->Update = &Rotator;
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -326,7 +327,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 		lastY = yPos;
 
 		Application::GetInstance()->mainCamera.ProcessMouse(xOffset, yOffset);
-	}
+	}	
 	*/
 
 	return SDL_APP_CONTINUE;
