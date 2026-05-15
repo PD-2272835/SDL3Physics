@@ -9,8 +9,8 @@ Scene* SceneManagement::CreateScene(SDL_GPUDevice* device)
 	s->id_generator = 0;
 	s->entities = new Entity[MAX_ENTITIES];
 	s->maxEntities = MAX_ENTITIES;
-	s->vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, UINT16_MAX * sizeof(Vertex));
-	s->indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, UINT16_MAX * sizeof(uint32_t));
+	s->vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, UINT32_MAX * sizeof(Vertex));
+	s->indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, UINT32_MAX * sizeof(uint32_t));
 
 	return s;
 }

@@ -32,7 +32,7 @@ typedef struct Entity
 	mfg::vec3 position{};
 	mfg::quat rotation{};
 	mfg::vec3 scale = { 1.f }; //default scale should be 1
-
+	mfg::vec3 axis{};
 
 	mfg::vec3 velocity{};	//physics related data
 	mfg::vec3 acceleration{};

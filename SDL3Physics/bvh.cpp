@@ -152,13 +152,16 @@ void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 		if (!entities->at(i).meshPath.empty())
 		{
 			AABB box = static_cast<Mesh*>(mngr->GetAsset(entities->at(i).meshPath).get())->Bounds;
-		
+			box.center = entities->at(i).position;
+			box.upperBound += box.center;
+			box.lowerBound += box.center;
+
 			nodes.emplace_back(
 				box,
 				Create3DMorton(
-					box.center.x() + entities->at(i).position.x(),
-					box.center.y() + entities->at(i).position.y(),
-					box.center.z() + entities->at(i).position.z(),
+					box.center.x(),
+					box.center.y(),
+					box.center.z(),
 					worldSize),
 				0, 0, 0, &entities->at(i));
 		}

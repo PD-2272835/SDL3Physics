@@ -47,7 +47,7 @@ const static Uint16 quadIndices[]
 
 void Rotator(Entity* entity)
 {
-	mfg::quat someRot = mfg::quat(mfg::vec3(0, 0.5, 0.5), Application::GetInstance()->Time.delta);
+	mfg::quat someRot = mfg::quat(entity->axis, Application::GetInstance()->Time.delta);
 	//std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
 	entity->rotation = entity->rotation * someRot;
 }
@@ -174,10 +174,26 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* camEntity = SceneManagement::CreateEntity(mainScene);
 	Application::GetInstance()->mainCamera = Camera(camEntity);
 
+
+
+
+	for (int i = -20; i < 20; ++i)
+	{
+		Entity* entity = SceneManagement::CreateEntity(mainScene);
+		entity->name = i;
+		entity->position = mfg::vec3(i * 3, 0, 0);
+		entity->renderable = true;
+		entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
+		entity->Update = &Rotator;
+		entity->axis = mfg::vec3(i/2, i*2, i);
+	}
+
+
+/*
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "taxi";
-	entity->position = mfg::vec3(1.f, 2.f, 3.f);
+	entity->position = mfg::vec3(0.f, 0.f, 0.f);
 	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
 	//entity->hasGravity = true;
@@ -188,10 +204,12 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "SUV";
-	entity->position = mfg::vec3(0.f);
+	entity->position = mfg::vec3(0, 20.f, 0);
 	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
 	entity->hasCollision = true;
+	entity->hasGravity = true;
+	entity->hasPhysics = true;
 	//entity->Update = &Rotator;
 
 	entity = SceneManagement::CreateEntity(mainScene);
@@ -204,7 +222,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->hasCollision = true;
 	//entity->hasGravity = true;
 	//entity->Update = &Rotator;
-
+*/
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
 
@@ -257,7 +275,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	//hopefully this works - worth noting this also handles rendering of the scene
 	std::vector<Entity> collisionEntities = SceneManagement::GetCollisionEntities(mainScene);
 	
-	Bvh collisionTree(&collisionEntities, (size_t)1000);
+	Bvh collisionTree;
+
+	if (!collisionEntities.empty())
+	{
+		collisionTree = Bvh(&collisionEntities, (size_t)1000);
+	}
+	
 
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, collisionTree, App->Time.delta);
 	SceneManagement::DrawScene(commandBuffer, mainScene);
