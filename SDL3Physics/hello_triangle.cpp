@@ -48,7 +48,7 @@ const static Uint16 quadIndices[]
 void Rotator(Entity* entity)
 {
 	mfg::quat someRot = mfg::quat(mfg::vec3(0, 0.5, 0.5), Application::GetInstance()->Time.delta);
-	std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
+	//std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
 	entity->rotation = entity->rotation * someRot;
 }
 
@@ -176,7 +176,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
-	entity->name = "blood sacrifice";
+	entity->name = "taxi";
 	entity->position = mfg::vec3(1.f, 2.f, 3.f);
 	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
@@ -187,23 +187,23 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
-	entity->name = "blood sacrifice 2";
+	entity->name = "SUV";
 	entity->position = mfg::vec3(0.f);
 	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
 	entity->hasCollision = true;
-	entity->Update = &Rotator;
+	//entity->Update = &Rotator;
 
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
-	entity->name = "blood sacrifice 3";
+	entity->name = "amberlamps";
 	entity->velocity = mfg::vec3(0.f, 40.f, 0.f);
 	entity->position = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasPhysics = true;
 	entity->hasCollision = true;
 	//entity->hasGravity = true;
-	entity->Update = &Rotator;
+	//entity->Update = &Rotator;
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
@@ -261,6 +261,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
 	SceneManagement::UpdateEntities(commandBuffer, mainScene, collisionTree, App->Time.delta);
 	SceneManagement::DrawScene(commandBuffer, mainScene);
+
+
 
 
 	//Anything else we want to do goes below here

@@ -66,6 +66,9 @@ struct Mesh : Asset
 	Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture*> textures)
 		: Vertices(vertices), Indices(indices), Textures(textures)
 	{};
+	Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture*> textures, AABB bounds)
+		: Vertices(vertices), Indices(indices), Textures(textures), Bounds(bounds)
+	{};
 };
 
 struct Model : Asset

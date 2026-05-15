@@ -16,17 +16,25 @@
 struct BVHNode
 {
 	AABB box;
-	size_t object; // this value is an offset for bottom up or a morton code for top down
-	size_t parentOffset;
-	size_t left;
-	size_t right;
+	uint64_t object; // this value is an offset for bottom up or a morton code for top down
+	uint32_t parentOffset;
+	uint32_t left;
+	uint32_t right;
+	Entity* entity;
 
-	BVHNode(AABB newBox, size_t objOffset, size_t parOffset, size_t leftOffset, size_t rightOffset) : 
+
+	BVHNode(AABB newBox, uint64_t objOffset, uint32_t parOffset, uint32_t leftOffset, uint32_t rightOffset, Entity* entityPtr) :
 			box(newBox), object(objOffset), parentOffset(parOffset), left(leftOffset), right(rightOffset)
 	{
+		entity = entityPtr;
+	};
+	BVHNode(AABB newBox, uint64_t objOffset, uint32_t parOffset, uint32_t leftOffset, uint32_t rightOffset) :
+			box(newBox), object(objOffset), parentOffset(parOffset), left(leftOffset), right(rightOffset)
+	{
+		entity = nullptr;
 	};
 
-	bool isLeaf() const { return left < 0 && right < 0; } //this node is a leaf if left and right are both not set
+	bool isLeaf() const { return left <= 0 && right <= 0; } //this node is a leaf if left and right are both not set
 };
 
 uint64_t BitExpansion(uint64_t x);
@@ -49,6 +57,9 @@ public:
 
 	void TopDownConstruction(std::vector<Entity>* entities);
 	size_t CreateTopDownSubtree(size_t begin, size_t end);
+
+	bool FindCollision(AABB box, Entity* entity, BVHNode node, std::vector<EntityHandle>* collisionInfo);
+	std::vector<EntityHandle> CheckCollision(Entity* entity);
 };
 
 #endif

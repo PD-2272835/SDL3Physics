@@ -1,6 +1,13 @@
 #include "bvh.hpp"
 
 
+Bvh::Bvh()
+{
+	nodes = std::vector<BVHNode>();
+	rootNodeIndex = 0;
+	worldSize = 1000;
+}
+
 Bvh::Bvh(std::vector<Entity>* scene, size_t worldSize)
 {
 	TopDownConstruction(scene);
@@ -12,7 +19,7 @@ void Bvh::BottomUpConstruction(const std::vector<AABB>* boxes)
 	{
 		if (nodes.size() < boxes->size())
 		{
-			nodes.emplace_back(boxes->data()[i], i, 0, 0, 0);
+			nodes.emplace_back(boxes->data()[i], i, 0, 0, 0, nullptr);
 		}
 	}
 	
@@ -116,21 +123,23 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 //Create a BVH subtree from index into Nodes vector
 size_t Bvh::CreateTopDownSubtree(size_t begin, size_t end)
 {
-	if (begin <= end)
+	if (begin == end)
 	{
 		return begin; //return the index of this leaf
 	}
 	else {
-		size_t m = std::ceil((begin + end) / 2); //find the centerpoint of the array where nodes[begin] is the start and nodes[end] is the end
-		auto left = CreateTopDownSubtree(begin, m - 1);
-		auto right = CreateTopDownSubtree(m, end);
+		size_t m = std::floor((begin + end) / 2); //find the centerpoint of the array where nodes[begin] is the start and nodes[end] is the end
+		auto left = CreateTopDownSubtree(begin, m);
+		auto right = CreateTopDownSubtree(m+1, end);
 		nodes.emplace_back(
 			Union(nodes[left].box, nodes[right].box),
 			0,
 			0, //parent might need to be set correctly
 			left,
-			right
+			right,
+			nullptr
 		);
+		return nodes.size() - 1;
 	}
 }
 
@@ -143,6 +152,7 @@ void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 		if (!entities->at(i).meshPath.empty())
 		{
 			AABB box = static_cast<Mesh*>(mngr->GetAsset(entities->at(i).meshPath).get())->Bounds;
+		
 			nodes.emplace_back(
 				box,
 				Create3DMorton(
@@ -150,7 +160,7 @@ void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 					box.center.y() + entities->at(i).position.y(),
 					box.center.z() + entities->at(i).position.z(),
 					worldSize),
-				0, 0, 0);
+				0, 0, 0, &entities->at(i));
 		}
 	}
 	
@@ -159,5 +169,39 @@ void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 		[](const BVHNode& a, const BVHNode& b) //sort lambda
 		{return a.object < b.object; });
 
-	rootNodeIndex = CreateTopDownSubtree(0, nodes.size()); //recursively generate the tree structure and get the index of the root node
+	rootNodeIndex = CreateTopDownSubtree(0, nodes.size()-1); //recursively generate the tree structure and get the index of the root node
 }
+
+
+
+bool Bvh::FindCollision(AABB box, Entity* entity, BVHNode node, std::vector<EntityHandle>* collisionInfo)
+{
+	if(!Intersects(box, node.box)) return false;
+
+	if (node.isLeaf())
+	{
+		if (entity != node.entity)
+		{
+			if (Intersects(box, node.box))
+			{
+				collisionInfo->push_back(node.entity->selfHandle);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	FindCollision(box, entity, nodes[node.left], collisionInfo);
+	FindCollision(box, entity, nodes[node.right], collisionInfo);
+}
+
+std::vector<EntityHandle>  Bvh::CheckCollision(Entity* entity)
+{
+	std::vector<EntityHandle> res;
+	AABB box = static_cast<Mesh*>(AssetManagement::GetInstance()->GetAsset(entity->meshPath).get())->Bounds;
+
+	FindCollision(box, entity, nodes[rootNodeIndex], &res);
+
+	return res;
+}
+

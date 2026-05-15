@@ -110,7 +110,19 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, Bv
 			if (currentEntity->Update != nullptr) currentEntity->Update(currentEntity); //process the update callback for 
 
 			//do collision stuff here
-
+			if (currentEntity->hasCollision)
+			{
+				std::vector<EntityHandle> collisions = collisionTree.CheckCollision(currentEntity);
+				if (!collisions.empty())
+				{
+					std::cout << currentEntity->name << " collided with ";
+					for (auto i : collisions)
+					{
+						std::cout << EntityFromHandle(scene, i)->name << ", ";
+					}
+					std::cout << "\n";
+				}
+			}
 
 			//account for mass?
 			if (currentEntity->hasPhysics)
@@ -131,7 +143,6 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, Bv
 				//realistically rendering should happen within this loop, 
 				//as this would prevent looping over every object in the scene twice
 			}
-			//std::cout << mfg::VecToString(currentEntity->position) << "\n";
 		}
 	}
 }

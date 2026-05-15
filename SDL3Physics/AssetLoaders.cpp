@@ -74,13 +74,13 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 	std::vector<mfg::vec3> positions;
 	std::vector<mfg::vec2> uvs;
 	std::vector<mfg::vec3> normals;
+	AABB bounds;
 
 	if (file)
 	{
 		std::string line;
 		int linenum = 0;
 		std::vector<Internal_FaceIndex> faces;
-		AABB bounds;
 		while (startOffset < size)
 		{
 			linenum++;
@@ -89,6 +89,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 			if (line.length() == 0) continue;
 			//std::cout << " " << line << " ";
 			std::vector<Internal_FaceIndex> face;
+			mfg::vec3 pos;
 			switch (line.c_str()[0])
 			{
 			case 'v':
@@ -96,7 +97,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					mfg::vec3 pos = ParseObjVector<3>(line.substr(2, line.length()));
+					pos = ParseObjVector<3>(line.substr(2, line.length()));
 					positions.push_back(pos);
 					bounds.lowerBound = mfg::Min(bounds.lowerBound, pos);
 					bounds.upperBound = mfg::Max(bounds.lowerBound, pos);
@@ -131,6 +132,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 		std::vector<uint32_t> indices;
 		std::vector<Texture*> textures;
 
+
 		//fill data into model
 		for (size_t i = 0; i < faces.size(); ++i)
 		{
@@ -141,7 +143,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 			indices.emplace_back(i); //casts i to uint32_t
 		}
 
-		std::shared_ptr<Mesh> model(new Mesh(vertices, indices, textures)); //create a dynamically allocated smart ptr to the resulting model
+		std::shared_ptr<Mesh> model(new Mesh(vertices, indices, textures, bounds)); //create a dynamically allocated smart ptr to the resulting model
 		return model;
 	}
 
