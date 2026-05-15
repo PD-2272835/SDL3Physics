@@ -1,30 +1,18 @@
 #include "bvh.hpp"
 
-bvh::bvh()
+
+Bvh::Bvh(std::vector<Entity>* scene, size_t worldSize)
 {
-	rootNodeIndex = 0;
-	worldSize = -1;
+	TopDownConstruction(scene);
 }
 
-bvh::bvh(const std::vector<AABB> boxes, const size_t worldSize = -1)
+void Bvh::BottomUpConstruction(const std::vector<AABB>* boxes)
 {
-	if (worldSize > -1)
+	for (size_t i = 0; i < boxes->size(); ++i)
 	{
-		TopDownConstruction(boxes);
-	}
-	else
-	{
-		BottomUpConstruction(boxes);
-	}
-}
-
-void bvh::BottomUpConstruction(std::vector<AABB> boxes)
-{
-	for (size_t i = 0; i < boxes.size(); ++i)
-	{
-		if (nodes.size() < boxes.size())
+		if (nodes.size() < boxes->size())
 		{
-			nodes.emplace_back(boxes[i], i, 0, 0, 0);
+			nodes.emplace_back(boxes->data()[i], i, 0, 0, 0);
 		}
 	}
 	
@@ -126,14 +114,14 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 
 
 //Create a BVH subtree from index into Nodes vector
-size_t bvh::CreateTopDownSubtree(size_t begin, size_t end)
+size_t Bvh::CreateTopDownSubtree(size_t begin, size_t end)
 {
-	if (begin == end)
+	if (begin <= end)
 	{
 		return begin; //return the index of this leaf
 	}
 	else {
-		size_t m = std::floor((begin + end) / 2); //find the centerpoint of the array where nodes[begin] is the start and nodes[end] is the end
+		size_t m = std::ceil((begin + end) / 2); //find the centerpoint of the array where nodes[begin] is the start and nodes[end] is the end
 		auto left = CreateTopDownSubtree(begin, m - 1);
 		auto right = CreateTopDownSubtree(m, end);
 		nodes.emplace_back(
@@ -147,18 +135,23 @@ size_t bvh::CreateTopDownSubtree(size_t begin, size_t end)
 }
 
 //construct an AABB BVH tree from a list of AABBs
-void bvh::TopDownConstruction(std::vector<AABB> boxes)
+void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 {
-	for (size_t i = 0; i < boxes.size(); ++i)
+	AssetManagement* mngr = AssetManagement::GetInstance();
+	for (size_t i = 0; i < entities->size(); ++i)
 	{
-		nodes.emplace_back(
-			boxes[i],
-			Create3DMorton(
-				boxes[i].center.x(),
-				boxes[i].center.y(),
-				boxes[i].center.z(),
-				worldSize),
-			0, 0, 0);
+		if (!entities->at(i).meshPath.empty())
+		{
+			AABB box = static_cast<Mesh*>(mngr->GetAsset(entities->at(i).meshPath).get())->Bounds;
+			nodes.emplace_back(
+				box,
+				Create3DMorton(
+					box.center.x() + entities->at(i).position.x(),
+					box.center.y() + entities->at(i).position.y(),
+					box.center.z() + entities->at(i).position.z(),
+					worldSize),
+				0, 0, 0);
+		}
 	}
 	
 	//sort the nodes array by morton code (better spacial locality/cache friendliness)

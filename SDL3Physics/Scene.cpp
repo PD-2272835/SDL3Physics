@@ -80,13 +80,26 @@ void SceneManagement::DestroyEntity(Scene* scene, const EntityHandle& entityHand
 }
 
 
-//this should run each frame
-void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta)
+std::vector<Entity> SceneManagement::GetCollisionEntities(Scene* scene)
 {
-	std::vector<AABB> boxes = scene->colliders;
+	std::vector<Entity> res;
+	for (size_t i = 0; i < scene->maxEntities; ++i)
+	{
+		Entity* currentEntity = &scene->entities[i];
+		if (currentEntity->allocated && currentEntity->enabled && currentEntity->hasCollision)
+		{
+			res.push_back(*currentEntity);
+		}
+	}
 
-	//bvh collisionTree(boxes, 100000);
+	return res;
+}
 
+
+
+//this should run each frame
+void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, Bvh& collisionTree, double timeDelta)
+{
 	//iterate through all entities
 	for (size_t i = 0; i < scene->maxEntities; ++i)
 	{

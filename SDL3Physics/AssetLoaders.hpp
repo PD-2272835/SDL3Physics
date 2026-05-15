@@ -4,6 +4,7 @@
 #include <vector>
 #include <vec.hpp>
 #include "AssetTypes.hpp"
+#include "Intersections.hpp"
 #include <string>
 
 struct Internal_FaceIndex

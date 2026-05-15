@@ -180,7 +180,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->position = mfg::vec3(1.f, 2.f, 3.f);
 	entity->scale = mfg::vec3(2.f);
 	entity->renderable = true;
-	entity->hasGravity = true;
+	//entity->hasGravity = true;
+	entity->hasCollision = true;
 	entity->hasPhysics = true;
 	entity->Update = &Rotator;
 
@@ -190,6 +191,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->position = mfg::vec3(0.f);
 	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
+	entity->hasCollision = true;
 	entity->Update = &Rotator;
 
 	entity = SceneManagement::CreateEntity(mainScene);
@@ -199,7 +201,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->position = mfg::vec3(2.f);
 	entity->renderable = true;
 	entity->hasPhysics = true;
-	entity->hasGravity = true;
+	entity->hasCollision = true;
+	//entity->hasGravity = true;
 	entity->Update = &Rotator;
 
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
@@ -249,8 +252,14 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	App->depthInfo = depthInfo;
 	//std::cout << App->Time.delta;
 
+	
+
 	//hopefully this works - worth noting this also handles rendering of the scene
-	SceneManagement::UpdateEntities(commandBuffer, mainScene, App->Time.delta);
+	std::vector<Entity> collisionEntities = SceneManagement::GetCollisionEntities(mainScene);
+	
+	Bvh collisionTree(&collisionEntities, (size_t)1000);
+
+	SceneManagement::UpdateEntities(commandBuffer, mainScene, collisionTree, App->Time.delta);
 	SceneManagement::DrawScene(commandBuffer, mainScene);
 
 

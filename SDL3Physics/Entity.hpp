@@ -2,6 +2,7 @@
 #define _ENTITY_HPP_
 #include <vec.hpp>
 #include <quaternion.hpp>
+#include "Intersections.hpp"
 
 enum Kind {
 	null
@@ -13,11 +14,6 @@ struct EntityHandle //if a reference to an object is stored for a long period of
 	size_t offset; //offset into the scene's entity array
 	uint64_t id;   //unique id
 };
-/*
-struct Velocity
-{
-	mfg::vec3 linear(0.f);
-};*/
 
 
 //MEGASTRUCT - this object holds data synonymous with all entities in the scene, in an attempt at cache friendliness

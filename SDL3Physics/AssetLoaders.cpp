@@ -80,6 +80,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 		std::string line;
 		int linenum = 0;
 		std::vector<Internal_FaceIndex> faces;
+		AABB bounds;
 		while (startOffset < size)
 		{
 			linenum++;
@@ -95,7 +96,10 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 				{
 				case ' ':
 					//vertex position
-					positions.push_back(ParseObjVector<3>(line.substr(2, line.length())));
+					mfg::vec3 pos = ParseObjVector<3>(line.substr(2, line.length()));
+					positions.push_back(pos);
+					bounds.lowerBound = mfg::Min(bounds.lowerBound, pos);
+					bounds.upperBound = mfg::Max(bounds.lowerBound, pos);
 					break;
 				case 't':
 					//UV

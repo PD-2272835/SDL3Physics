@@ -21,7 +21,7 @@ struct UniformBuffer
 };
 
 //global scene state
-struct Scene
+typedef struct Scene
 {
 	std::string name;
 	uint64_t id_generator = 0; //used to give EntityHandles a unique signature
@@ -29,8 +29,6 @@ struct Scene
 	size_t maxEntities = MAX_ENTITIES;
 	Entity zero_entity = {}; //entity to allow operations to gracefully fail
 	float gravityStrength = 9.8f;
-	std::vector<AABB> colliders;
-
 	//track buffers in scene struct
 	Buffer vertexBuffer;
 	Buffer indexBuffer;
@@ -49,8 +47,10 @@ namespace SceneManagement
 	Entity* CreateEntity(Scene* scene);
 	void DestroyEntity(Scene* scene, const EntityHandle &entityHandle);
 
+	std::vector<Entity> GetCollisionEntities(Scene* scene);
+
 	Entity* EntityFromHandle(Scene* scene, const EntityHandle &handle); //Get a ptr to an entity from an Entity Handle
-	void UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, double timeDelta); //Update all entities in provided scene
+	void UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, Bvh& collisionTree, double timeDelta); //Update all entities in provided scene
 	
 	void DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, Entity& entity);
 	void DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene);

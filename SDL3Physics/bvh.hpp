@@ -6,6 +6,9 @@
 #include <vector>
 #include <algorithm>
 #include "Intersections.hpp"
+#include "Entity.hpp"
+#include "AssetManagement.hpp"
+
 
 // Adapted from Box2D creator Erin Catto's slides at GDC 2019
 // https://box2d.org/files/ErinCatto_DynamicBVH_GDC2019.pdf
@@ -30,19 +33,21 @@ uint64_t BitExpansion(uint64_t x);
 uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize);
 
 
-class bvh
+class Bvh
 {
+public:
+
+	Bvh();
+	Bvh(std::vector<Entity>* entities, size_t worldSize);
+
 	std::vector<BVHNode> nodes;
 	size_t rootNodeIndex; //index into the nodes array that contains all physics objects
 	size_t worldSize;
 
-	bvh();
-	bvh(const std::vector<AABB> boxes, const size_t worldSize);
-
 	//slow, probably don't use
-	void BottomUpConstruction(std::vector<AABB> boxes);
+	void BottomUpConstruction(const std::vector<AABB>* boxes);
 
-	void TopDownConstruction(std::vector<AABB> boxes);
+	void TopDownConstruction(std::vector<Entity>* entities);
 	size_t CreateTopDownSubtree(size_t begin, size_t end);
 };
 

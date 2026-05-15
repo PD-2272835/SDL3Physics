@@ -3,6 +3,7 @@
 
 #include <vec.hpp>
 #include <vector>
+#include "Intersections.hpp"
 
 
 struct GFXHandle
@@ -60,6 +61,7 @@ struct Mesh : Asset
 	std::vector<Vertex> Vertices;
 	std::vector<uint32_t> Indices;
 	std::vector<Texture*> Textures;
+	AABB Bounds;
 
 	Mesh(std::vector<Vertex> vertices, std::vector<uint32_t> indices, std::vector<Texture*> textures)
 		: Vertices(vertices), Indices(indices), Textures(textures)
