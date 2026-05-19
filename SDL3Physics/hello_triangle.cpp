@@ -176,8 +176,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 
 
-
-	for (int i = -20; i < 20; ++i)
+	
+	for (int i = -50; i < 50; ++i)
 	{
 		Entity* entity = SceneManagement::CreateEntity(mainScene);
 		entity->name = i;
@@ -187,9 +187,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 		entity->Update = &Rotator;
 		entity->axis = mfg::vec3(i/2, i*2, i);
 	}
-
-
-/*
+	
+	/*
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "taxi";
@@ -222,7 +221,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->hasCollision = true;
 	//entity->hasGravity = true;
 	//entity->Update = &Rotator;
-*/
+	*/
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
 

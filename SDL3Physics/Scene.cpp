@@ -9,8 +9,8 @@ Scene* SceneManagement::CreateScene(SDL_GPUDevice* device)
 	s->id_generator = 0;
 	s->entities = new Entity[MAX_ENTITIES];
 	s->maxEntities = MAX_ENTITIES;
-	s->vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, UINT32_MAX * sizeof(Vertex));
-	s->indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, UINT32_MAX * sizeof(uint32_t));
+	s->vertexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_VERTEX, UINT16_MAX * sizeof(Vertex));
+	s->indexBuffer = Buffer(device, SDL_GPU_BUFFERUSAGE_INDEX, UINT16_MAX * sizeof(uint32_t));
 
 	return s;
 }
@@ -233,6 +233,10 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model uwu
 		//this should be changed if loading an obj or other 3D model returns a different struct
 		Mesh* mesh = static_cast<Mesh*>(ref.get());
+		if (mesh->handle.gfxInitialized)
+		{
+			return; //do not upload model to GPU if already in GPU memory
+		}
 		GFXHandle handle;
 		bool uploadCheck = false;
 
