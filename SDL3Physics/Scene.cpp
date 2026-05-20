@@ -228,6 +228,12 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 	{
 		std::shared_ptr<Asset> ref = AssetManagement::GetInstance()->GetAsset(entity.meshPath.c_str()); //intermediate step to store 
 		
+		if (ref == nullptr) //guard against invalid file path
+		{
+			std::cout << "invalid filepath\n";
+			return;
+		}
+
 		scene->assetRefs.push_back(ref);
 
 		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model uwu
