@@ -28,8 +28,8 @@ Scene* mainScene;
 
 SDL_GPUTexture* swapchainTexture; //RenderTarget equivalent (frame buffer)
 
-Uint32 Width = 1280;
-Uint32 Height = 720;
+Uint32 Width = 1920;
+Uint32 Height = 1080;
 
 const static Vertex quad[]
 {
@@ -173,19 +173,39 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* camEntity = SceneManagement::CreateEntity(mainScene);
 	Application::GetInstance()->mainCamera = Camera(camEntity);
+	Application::GetInstance()->mainCamera.projMat = dataArray[0];
 
 
 
 	
-	for (int i = -50; i < 50; ++i)
+	for (int i = -25; i < 25; ++i)
 	{
-		Entity* entity = SceneManagement::CreateEntity(mainScene);
-		entity->name = i;
-		entity->position = mfg::vec3(i * 3, 0, 0);
-		entity->renderable = true;
-		entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
-		entity->Update = &Rotator;
-		entity->axis = mfg::vec3(i/2, i*2, i);
+		if (i == 0) continue;
+		for (int j = -20; j < 20; ++j)
+		{
+			Entity* entity = SceneManagement::CreateEntity(mainScene);
+			entity->name = std::to_string(i+j);
+			entity->position = mfg::vec3(i * 3, j*3, 0);
+			entity->renderable = true;
+			entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
+			entity->Update = &Rotator;
+			entity->hasPhysics = true;
+			entity->hasCollision = true;
+			entity->velocity = mfg::vec3(0, 30, 0);
+			if (i == 0)
+			{
+				entity->hasGravity = true;
+			}
+			if (i % 2 == 0)
+			{
+				entity->velocity += mfg::vec3(i, 0, -i / 2);
+			}
+			else {
+				entity->velocity += mfg::vec3(i, i, 4);
+			}
+
+			entity->axis = mfg::vec3(i / 3, i * j, i);
+		}
 	}
 	
 	/*
@@ -276,6 +296,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 	
 	Bvh collisionTree;
 
+	
 	if (!collisionEntities.empty())
 	{
 		collisionTree = Bvh(&collisionEntities, (size_t)1000);

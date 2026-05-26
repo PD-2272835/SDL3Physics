@@ -18,12 +18,12 @@ AABB Union(const AABB& a, const AABB& b)
 bool Intersects(const AABB& a, const AABB& b)
 {
 	return (
-		a.lowerBound.x() <= b.upperBound.x() &&
-		a.upperBound.x() >= b.lowerBound.x() &&
-		a.lowerBound.y() <= b.upperBound.y() &&
-		a.upperBound.y() >= b.lowerBound.y() &&
-		a.lowerBound.z() <= b.upperBound.z() &&
-		a.upperBound.z() >= b.lowerBound.z());
+		(a.lowerBound.x() <= b.upperBound.x() &&
+		a.upperBound.x() >= b.lowerBound.x()) &&
+		(a.lowerBound.y() <= b.upperBound.y() &&
+		a.upperBound.y() >= b.lowerBound.y()) &&
+		(a.lowerBound.z() <= b.upperBound.z() &&
+		a.upperBound.z() >= b.lowerBound.z()));
 }
 
 //Intersection test between a point and an AABB

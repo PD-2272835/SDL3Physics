@@ -9,7 +9,7 @@
 #include "AssetManagement.hpp" //includes std::vector
 #include "Application.hpp"
 #include "bvh.hpp"
-#define MAX_ENTITIES 1024
+#define MAX_ENTITIES 2048
 
 
 //Idk where else to put this

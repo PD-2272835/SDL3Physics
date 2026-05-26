@@ -50,7 +50,7 @@ mfg::mat4 Camera::GetMatrix()
 	if (dirty)
 	{
 		std::cout << "updated view mat\n";
-		viewMat = mfg::View(right, up, front, m_entity->position);
+		viewMat = mfg::mul(projMat, mfg::View(right, up, front, m_entity->position));
 		dirty = false;
 	}
 

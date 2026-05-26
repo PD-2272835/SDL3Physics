@@ -14,7 +14,7 @@ struct Clock
 	uint32_t last_tick_time = 0;
 	double delta = 0;
 	double unscaledTimeDelta = 0;
-	float timeScale = 1.f;
+	float timeScale = 0.f;
 
 	void tick()
 	{

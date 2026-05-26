@@ -209,7 +209,7 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 
 		Application* app = Application::GetInstance();
 		//update push constants so that this entity is rendered with it's transformation parameters
-		UniformBuffer uniformData = { app->mainCamera.GetMatrix(), model, app->Time.delta};
+		UniformBuffer uniformData = { mfg::mul(app->mainCamera.GetMatrix(), model), model, app->Time.delta};
 
 		//Update the uniform data used to render this Entity
 		//TODO: Move this to be pulled from a storage buffer that's filled by UpdateEntities()

@@ -19,15 +19,15 @@ enum cameraMovement
 class Camera
 {
 public:
-	float movementSpeed = 10.f;
-	bool dirty = true;
-
-	Entity* m_entity = nullptr;
+	mfg::mat4 viewMat;
+	mfg::mat4 projMat;
 	mfg::vec3 front = { 0, 0, 1 };
 	mfg::vec3 right = { 1, 0, 0 };
 	mfg::vec3 up = { 0, 1, 0 };
 	mfg::vec3 worldUp;
-	mfg::mat4 viewMat;
+	Entity* m_entity = nullptr;
+	float movementSpeed = 10.f;
+	bool dirty = true;
 
 	Camera() {};
 

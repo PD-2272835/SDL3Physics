@@ -8,8 +8,9 @@ Bvh::Bvh()
 	worldSize = 1000;
 }
 
-Bvh::Bvh(std::vector<Entity>* scene, size_t worldSize)
+Bvh::Bvh(std::vector<Entity>* scene, size_t WorldSize)
 {
+	worldSize = WorldSize;
 	TopDownConstruction(scene);
 }
 
@@ -52,7 +53,8 @@ void Bvh::BottomUpConstruction(const std::vector<AABB>* boxes)
 			//comparing references like this could be UB?
 			if (&closestNode != &working[i])
 			{
-				//set the parent to be the offset of this node into the nodes array
+				//set the 
+				//parent to be the offset of this node into the nodes array
 				size_t nodesIndex = nodes.size() + i;
 
 				working[i].parentOffset = nodesIndex;
