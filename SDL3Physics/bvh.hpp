@@ -1,6 +1,6 @@
 #ifndef _BVH_HPP_
 #define _BVH_HPP_
-#include <vec.hpp> //mfg
+#include <vec.hpp> //sgm
 #include <functions.hpp>
 #include <cmath>
 #include <vector>

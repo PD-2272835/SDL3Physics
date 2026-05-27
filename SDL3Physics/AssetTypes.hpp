@@ -24,12 +24,12 @@ struct Asset
 
 struct Vertex
 {
-	mfg::vec3 Position;
-	mfg::vec3 Normal;
-	mfg::vec2 UV;
+	sgm::vec3 Position;
+	sgm::vec3 Normal;
+	sgm::vec2 UV;
 
 	Vertex() : Position({}), Normal({}), UV({}) {};
-	Vertex(mfg::vec3 position, mfg::vec3 normal, mfg::vec2 uv)
+	Vertex(sgm::vec3 position, sgm::vec3 normal, sgm::vec2 uv)
 		: Position(position), Normal(normal), UV(uv)
 	{};
 };

@@ -15,8 +15,8 @@
 //Idk where else to put this
 struct UniformBuffer
 {
-	mfg::mat4 View;
-	mfg::mat4 Model;
+	sgm::mat4 View;
+	sgm::mat4 Model;
 	float time;
 };
 

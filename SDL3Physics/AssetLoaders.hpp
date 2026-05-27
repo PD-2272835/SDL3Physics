@@ -15,7 +15,7 @@ struct Internal_FaceIndex
 
 std::string GetLineIter(const char* dataStream, const size_t& size, size_t& start);
 
-template<size_t dim> mfg::vec<dim, float> ParseObjVector(std::string line);
+template<size_t dim> sgm::vec<dim, float> ParseObjVector(std::string line);
 std::vector<Internal_FaceIndex> ParseObjFace(std::string line);
 Internal_FaceIndex ParseFaceIndex(std::string line);
 

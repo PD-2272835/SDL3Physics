@@ -21,9 +21,9 @@ std::string GetLineIter(const char* dataStream, const size_t &size, size_t &star
 }
 
 template<size_t dim>
-mfg::vec<dim, float> ParseObjVector(std::string line)
+sgm::vec<dim, float> ParseObjVector(std::string line)
 {
-	mfg::vec<dim, float> r;
+	sgm::vec<dim, float> r;
 	auto pos = line.find(' '); //find the first delimiter
 	for (size_t i = 0; i < dim; ++i)
 	{
@@ -71,9 +71,9 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 	size_t startOffset = 0;
 	void* file = SDL_LoadFile(path, &size);
 
-	std::vector<mfg::vec3> positions;
-	std::vector<mfg::vec2> uvs;
-	std::vector<mfg::vec3> normals;
+	std::vector<sgm::vec3> positions;
+	std::vector<sgm::vec2> uvs;
+	std::vector<sgm::vec3> normals;
 	AABB bounds;
 
 	if (file)
@@ -89,7 +89,7 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 			if (line.length() == 0) continue;
 			//std::cout << " " << line << " ";
 			std::vector<Internal_FaceIndex> face;
-			mfg::vec3 pos;
+			sgm::vec3 pos;
 			switch (line.c_str()[0])
 			{
 			case 'v':
@@ -99,8 +99,8 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 					//vertex position
 					pos = ParseObjVector<3>(line.substr(2, line.length()));
 					positions.push_back(pos);
-					bounds.lowerBound = mfg::Min(bounds.lowerBound, pos);
-					bounds.upperBound = mfg::Max(bounds.lowerBound, pos);
+					bounds.lowerBound = sgm::Min(bounds.lowerBound, pos);
+					bounds.upperBound = sgm::Max(bounds.lowerBound, pos);
 					break;
 				case 't':
 					//UV

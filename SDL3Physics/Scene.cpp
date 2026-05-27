@@ -129,8 +129,8 @@ void SceneManagement::UpdateEntities(SDL_GPUCommandBuffer* cmd, Scene* scene, Bv
 			{
 				if (currentEntity->hasGravity)
 				{
-					currentEntity->acceleration += mfg::vec3(0, -scene->gravityStrength, 0);
-					//std::cout << timeDelta << " " << mfg::VecToString(currentEntity.acceleration) << "\n";
+					currentEntity->acceleration += sgm::vec3(0, -scene->gravityStrength, 0);
+					//std::cout << timeDelta << " " << sgm::VecToString(currentEntity.acceleration) << "\n";
 				}
 				currentEntity->velocity += currentEntity->acceleration * timeDelta;
 				currentEntity->position += currentEntity->velocity * timeDelta;
@@ -198,18 +198,18 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 	if (handle->gfxInitialized)
 	{
 		//push UniformData 
-		mfg::mat4 model = mfg::mat4(1.f);
-		mfg::mat4 translate = mfg::Translate(entity.position);
-		mfg::mat4 rotate = entity.rotation.ToMat();
-		mfg::mat4 scale = mfg::Scale(entity.scale);
+		sgm::mat4 model = sgm::mat4(1.f);
+		sgm::mat4 translate = sgm::Translate(entity.position);
+		sgm::mat4 rotate = entity.rotation.ToMat();
+		sgm::mat4 scale = sgm::Scale(entity.scale);
 
-		model = mfg::mul(model, translate);
-		model = mfg::mul(model, rotate);
-		model = mfg::mul(model, scale);
+		model = sgm::mul(model, translate);
+		model = sgm::mul(model, rotate);
+		model = sgm::mul(model, scale);
 
 		Application* app = Application::GetInstance();
 		//update push constants so that this entity is rendered with it's transformation parameters
-		UniformBuffer uniformData = { mfg::mul(app->mainCamera.GetMatrix(), model), model, app->Time.delta};
+		UniformBuffer uniformData = { sgm::mul(app->mainCamera.GetMatrix(), model), model, app->Time.delta};
 
 		//Update the uniform data used to render this Entity
 		//TODO: Move this to be pulled from a storage buffer that's filled by UpdateEntities()

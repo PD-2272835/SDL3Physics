@@ -19,12 +19,12 @@ enum cameraMovement
 class Camera
 {
 public:
-	mfg::mat4 viewMat;
-	mfg::mat4 projMat;
-	mfg::vec3 front = { 0, 0, 1 };
-	mfg::vec3 right = { 1, 0, 0 };
-	mfg::vec3 up = { 0, 1, 0 };
-	mfg::vec3 worldUp;
+	sgm::mat4 viewMat;
+	sgm::mat4 projMat;
+	sgm::vec3 front = { 0, 0, 1 };
+	sgm::vec3 right = { 1, 0, 0 };
+	sgm::vec3 up = { 0, 1, 0 };
+	sgm::vec3 worldUp;
 	Entity* m_entity = nullptr;
 	float movementSpeed = 10.f;
 	bool dirty = true;
@@ -40,7 +40,7 @@ public:
 	void ProcessMouse(double xOffset, double yOffset);
 
 	void UpdateVectors();
-	mfg::mat4 GetMatrix();
+	sgm::mat4 GetMatrix();
 };
 
 #endif

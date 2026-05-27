@@ -41,7 +41,7 @@ void Bvh::BottomUpConstruction(const std::vector<AABB>* boxes)
 			int offset = 0;
 			for (size_t j = 0; j < working.size(); ++j)
 			{
-				float distanceBetween = mfg::SqrDistance(working[i].box.center, working[j].box.center);
+				float distanceBetween = sgm::SqrDistance(working[i].box.center, working[j].box.center);
 				if (&working[i] != &working[j] && lowestDist > distanceBetween)
 				{
 					lowestDist = distanceBetween;
@@ -105,15 +105,15 @@ uint64_t Create3DMorton(float x, float y, float z, const uint32_t worldSize)
 	z = (z + worldSize / 2) / worldSize;
 
 	//ensure this is the case before bit expansion
-	x = mfg::Clamp(x);
-	y = mfg::Clamp(y);
-	z = mfg::Clamp(z);
+	x = sgm::Clamp(x);
+	y = sgm::Clamp(y);
+	z = sgm::Clamp(z);
 
 	//create coordinates as 21 bit integer representations of each element
 	const int max = 2 ^ 21; //max representable value by each coordinate in a morton code
-	auto xi = mfg::Min(static_cast<int>(std::floor(x * max)), max);
-	auto yi = mfg::Min(static_cast<int>(std::floor(y * max)), max);
-	auto zi = mfg::Min(static_cast<int>(std::floor(z * max)), max);
+	auto xi = sgm::Min(static_cast<int>(std::floor(x * max)), max);
+	auto yi = sgm::Min(static_cast<int>(std::floor(y * max)), max);
+	auto zi = sgm::Min(static_cast<int>(std::floor(z * max)), max);
 
 	//expand the bitpattern of each element and pack them into a morton code
 	uint64_t morton = BitExpansion(xi) | (BitExpansion(yi) << 1) | (BitExpansion(zi) << 2);

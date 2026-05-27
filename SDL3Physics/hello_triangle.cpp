@@ -9,7 +9,7 @@
 
 #include <SDL3\SDL_main.h>
 #include <SDL3\SDL.h>
-#include <mfg.hpp>
+#include <sgm.hpp>
 #include "Shader.hpp"
 #include "Buffer.hpp"
 #include "Entity.hpp"
@@ -33,10 +33,10 @@ Uint32 Height = 1080;
 
 const static Vertex quad[]
 {
-	{mfg::vec3(-0.5f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 0.0f), mfg::vec2(1.0f, 1.0f)},	// top left
-	{mfg::vec3(-0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 1.0f, 0.0f), mfg::vec2(1.f, 0.f)},	// bottom left
-	{mfg::vec3(0.5f, 0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)},	// top right
-	{mfg::vec3(0.5f, -0.5f, 0.0f), mfg::vec3(1.0f, 0.0f, 1.0f), mfg::vec2(1.f, 0.5f)}	// bottom righta
+	{sgm::vec3(-0.5f, 0.5f, 0.0f), sgm::vec3(1.0f, 0.0f, 0.0f), sgm::vec2(1.0f, 1.0f)},	// top left
+	{sgm::vec3(-0.5f, -0.5f, 0.0f), sgm::vec3(1.0f, 1.0f, 0.0f), sgm::vec2(1.f, 0.f)},	// bottom left
+	{sgm::vec3(0.5f, 0.5f, 0.0f), sgm::vec3(1.0f, 0.0f, 1.0f), sgm::vec2(1.f, 0.5f)},	// top right
+	{sgm::vec3(0.5f, -0.5f, 0.0f), sgm::vec3(1.0f, 0.0f, 1.0f), sgm::vec2(1.f, 0.5f)}	// bottom righta
 };
 
 const static Uint16 quadIndices[]
@@ -47,7 +47,7 @@ const static Uint16 quadIndices[]
 
 void Rotator(Entity* entity)
 {
-	mfg::quat someRot = mfg::quat(entity->axis, Application::GetInstance()->Time.delta);
+	sgm::quat someRot = sgm::quat(entity->axis, Application::GetInstance()->Time.delta);
 	//std::cout << someRot.Magnitude() << " " << entity->rotation.Magnitude() << "\n";
 	entity->rotation = entity->rotation * someRot;
 }
@@ -59,7 +59,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	std::cout << sizeof(Uint32) << " uint32\n";
 	std::cout << sizeof(Uint64) << " uint64\n";
 	std::cout << sizeof(char) << " char\n";
-	std::cout << sizeof(mfg::vec3) << " vec3\n";
+	std::cout << sizeof(sgm::vec3) << " vec3\n";
 	std::cout << sizeof(float) << " float\n";
 	std::cout << sizeof(int) << " int\n";
 	std::cout << sizeof(std::size_t) << " size_t\n";
@@ -165,8 +165,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//Fill unchanging buffers in the program start, if data changes frequently this should be done wherever it needs to be changed (eg. Iterate) 
 	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
 
-	Application::GetInstance()->vSSBO = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(mfg::mat4));
-	mfg::mat4 dataArray[] = { mfg::Perspective(mfg::ToRadians(90.f), float(Width / Height), 0.3f, 1000.f) };
+	Application::GetInstance()->vSSBO = Buffer(device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, sizeof(sgm::mat4));
+	sgm::mat4 dataArray[] = { sgm::Perspective(sgm::ToRadians(90.f), float(Width / Height), 0.3f, 1000.f) };
 	Application::GetInstance()->vSSBO.UploadData(commandBuffer, (void*)dataArray, sizeof(dataArray), 0);
 
 
@@ -185,26 +185,26 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 		{
 			Entity* entity = SceneManagement::CreateEntity(mainScene);
 			entity->name = std::to_string(i+j);
-			entity->position = mfg::vec3(i * 3, j*3, 0);
+			entity->position = sgm::vec3(i * 3, j*3, 0);
 			entity->renderable = true;
 			entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
 			entity->Update = &Rotator;
 			entity->hasPhysics = true;
 			entity->hasCollision = true;
-			entity->velocity = mfg::vec3(0, 30, 0);
+			entity->velocity = sgm::vec3(0, 30, 0);
 			if (i == 0)
 			{
 				entity->hasGravity = true;
 			}
 			if (i % 2 == 0)
 			{
-				entity->velocity += mfg::vec3(i, 0, -i / 2);
+				entity->velocity += sgm::vec3(i, 0, -i / 2);
 			}
 			else {
-				entity->velocity += mfg::vec3(i, i, 4);
+				entity->velocity += sgm::vec3(i, i, 4);
 			}
 
-			entity->axis = mfg::vec3(i / 3, i * j, i);
+			entity->axis = sgm::vec3(i / 3, i * j, i);
 		}
 	}*/
 	
@@ -212,8 +212,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "taxi";
-	entity->position = mfg::vec3(1.f);
-	entity->scale = mfg::vec3(1.f);
+	entity->position = sgm::vec3(1.f);
+	entity->scale = sgm::vec3(1.f);
 	entity->renderable = true;
 	//entity->hasGravity = true;
 	entity->hasCollision = true;
@@ -223,8 +223,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "SUV";
-	entity->position = mfg::vec3(1.f, 20.f, 1.f);
-	entity->scale = mfg::vec3(1.f);
+	entity->position = sgm::vec3(1.f, 20.f, 1.f);
+	entity->scale = sgm::vec3(1.f);
 	entity->renderable = true;
 	entity->hasCollision = true;
 	entity->hasGravity = true;
@@ -234,8 +234,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
 	entity->name = "amberlamps";
-	entity->velocity = mfg::vec3(0.f, 20.f, 0.f);
-	entity->position = mfg::vec3(1.f, 30.f, 1.f);
+	entity->velocity = sgm::vec3(0.f, 20.f, 0.f);
+	entity->position = sgm::vec3(1.f, 30.f, 1.f);
 	entity->renderable = true;
 	entity->hasPhysics = true;
 	entity->hasCollision = true;

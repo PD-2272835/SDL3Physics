@@ -29,13 +29,13 @@ typedef struct Entity
 
 	EntityHandle selfHandle{};	//offset in the scene array to this object - "self"  hard limit of 2^32 | 2^64 objects on 32 and 64 bit systems respectively 
 
-	mfg::vec3 position{};
-	mfg::quat rotation{};
-	mfg::vec3 scale = { 1.f }; //default scale should be 1
-	mfg::vec3 axis = { 0.f, 1.f, 0.f };
+	sgm::vec3 position{};
+	sgm::quat rotation{};
+	sgm::vec3 scale = { 1.f }; //default scale should be 1
+	sgm::vec3 axis = { 0.f, 1.f, 0.f };
 
-	mfg::vec3 velocity{};	//physics related data
-	mfg::vec3 acceleration{};
+	sgm::vec3 velocity{};	//physics related data
+	sgm::vec3 acceleration{};
 	bool hasGravity = false;
 	bool hasPhysics = false;
 	bool hasCollision = false;
