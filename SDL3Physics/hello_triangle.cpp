@@ -177,7 +177,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 
 
-	
+	/*
 	for (int i = -25; i < 25; ++i)
 	{
 		if (i == 0) continue;
@@ -206,14 +206,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 			entity->axis = mfg::vec3(i / 3, i * j, i);
 		}
-	}
+	}*/
 	
-	/*
+	
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
 	entity->name = "taxi";
-	entity->position = mfg::vec3(0.f, 0.f, 0.f);
-	entity->scale = mfg::vec3(2.f);
+	entity->position = mfg::vec3(1.f);
+	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
 	//entity->hasGravity = true;
 	entity->hasCollision = true;
@@ -223,7 +223,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "SUV";
-	entity->position = mfg::vec3(0, 20.f, 0);
+	entity->position = mfg::vec3(1.f, 20.f, 1.f);
 	entity->scale = mfg::vec3(1.f);
 	entity->renderable = true;
 	entity->hasCollision = true;
@@ -234,14 +234,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
 	entity->name = "amberlamps";
-	entity->velocity = mfg::vec3(0.f, 40.f, 0.f);
-	entity->position = mfg::vec3(2.f);
+	entity->velocity = mfg::vec3(0.f, 20.f, 0.f);
+	entity->position = mfg::vec3(1.f, 30.f, 1.f);
 	entity->renderable = true;
 	entity->hasPhysics = true;
 	entity->hasCollision = true;
-	//entity->hasGravity = true;
+	entity->hasGravity = true;
 	//entity->Update = &Rotator;
-	*/
+	
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
 
