@@ -13,6 +13,19 @@ struct EntityHandle //if a reference to an object is stored for a long period of
 {
 	size_t offset; //offset into the scene's entity array
 	uint64_t id;   //unique id
+
+
+	//could just compare ID?
+	bool operator==(const EntityHandle& other)
+	{
+		return	(this->offset == other.offset) &&
+				(this->id == other.id);
+	}
+
+	bool operator !=(const EntityHandle& other)
+	{
+		return !(*this == other);
+	}
 };
 
 

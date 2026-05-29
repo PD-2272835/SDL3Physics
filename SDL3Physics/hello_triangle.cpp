@@ -172,6 +172,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* camEntity = SceneManagement::CreateEntity(mainScene);
+	camEntity->position = sgm::vec3(0, 0, -30);
 	Application::GetInstance()->mainCamera = Camera(camEntity);
 	Application::GetInstance()->mainCamera.projMat = dataArray[0];
 
@@ -206,6 +207,25 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 		}
 	} */
 	
+
+	//devkit demo (for match-up):
+	
+	for (int j = -5; j < 6; ++j)
+	{
+		for (int i = -5; i < 6; i++)
+		{
+			if ((j == 0 && i == 0) || (j == 0 && (i == -1 || i == 1))) continue;
+
+			Entity* entity = SceneManagement::CreateEntity(mainScene);
+			entity->name = ((i < 0) ? -i : i) + ((j < 0) ? -j : j);
+			entity->position = sgm::vec3(i * 3, j * 3, 0);
+			entity->renderable = true;
+			entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/box.obj";
+			entity->Update = &Rotator;
+			entity->axis = sgm::vec3(i/2, j*2, j*i);
+		}
+	}
+	/*
 	
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
@@ -239,7 +259,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->hasCollision = true;
 	entity->hasGravity = true;
 	//entity->Update = &Rotator;
-	
+	*/
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
 

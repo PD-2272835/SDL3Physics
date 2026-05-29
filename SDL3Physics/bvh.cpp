@@ -181,11 +181,11 @@ void Bvh::TopDownConstruction(std::vector<Entity>* entities)
 
 bool Bvh::FindCollision(AABB box, Entity* entity, BVHNode node, std::vector<EntityHandle>* collisionInfo)
 {
-	if(!Intersects(box, node.box)) return false;
+	if(!Intersects(box, node.box)) return false; //early collision rejection, no point in processing if not intersecting
 
 	if (node.isLeaf())
 	{
-		if (entity != node.entity)
+		if (entity->selfHandle != node.entity->selfHandle)
 		{
 			if (Intersects(box, node.box))
 			{
@@ -200,10 +200,15 @@ bool Bvh::FindCollision(AABB box, Entity* entity, BVHNode node, std::vector<Enti
 	FindCollision(box, entity, nodes[node.right], collisionInfo);
 }
 
-std::vector<EntityHandle>  Bvh::CheckCollision(Entity* entity)
+std::vector<EntityHandle> Bvh::CheckCollision(Entity* entity)
 {
 	std::vector<EntityHandle> res;
 	AABB box = static_cast<Mesh*>(AssetManagement::GetInstance()->GetAsset(entity->meshPath).get())->Bounds;
+	
+	//adjust box to test for current position of object
+	box.center = entity->position;
+	box.upperBound += box.center;
+	box.lowerBound += box.center;
 
 	FindCollision(box, entity, nodes[rootNodeIndex], &res);
 

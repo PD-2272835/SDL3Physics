@@ -45,6 +45,7 @@ public:
 	Clock Time;
 	Camera mainCamera;
 
+
 	SDL_GPUColorTargetInfo colorInfo = {};
 	SDL_GPUColorTargetInfo backgroundInfo = {};
 	SDL_GPUDepthStencilTargetInfo depthInfo = {};
