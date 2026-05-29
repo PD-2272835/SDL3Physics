@@ -36,8 +36,8 @@ public:
 		m_entity = entity;
 	}
 
-	void ProcessKeyboard(cameraMovement direction, double timeDelta);
-	void ProcessMouse(double xOffset, double yOffset);
+	void ProcessMovement(cameraMovement direction, double timeDelta);
+	void ProcessLook(double xOffset, double yOffset);
 
 	void UpdateVectors();
 	sgm::mat4 GetMatrix();

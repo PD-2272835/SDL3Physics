@@ -175,8 +175,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Application::GetInstance()->mainCamera = Camera(camEntity);
 	Application::GetInstance()->mainCamera.projMat = dataArray[0];
 
-
-
 	/*
 	for (int i = -25; i < 25; ++i)
 	{
@@ -206,7 +204,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 			entity->axis = sgm::vec3(i / 3, i * j, i);
 		}
-	}*/
+	} */
 	
 	
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
@@ -342,22 +340,22 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 			break;
 		//movement
 		case SDLK_W:
-			cam->ProcessKeyboard(FORWARD, time->unscaledTimeDelta);
+			cam->ProcessMovement(FORWARD, time->unscaledTimeDelta);
 			break;
 		case SDLK_S:
-			cam->ProcessKeyboard(BACKWARD, time->unscaledTimeDelta);
+			cam->ProcessMovement(BACKWARD, time->unscaledTimeDelta);
 			break;
 		case SDLK_A:
-			cam->ProcessKeyboard(LEFT, time->unscaledTimeDelta);
+			cam->ProcessMovement(LEFT, time->unscaledTimeDelta);
 			break;
 		case SDLK_D:
-			cam->ProcessKeyboard(RIGHT, time->unscaledTimeDelta);
+			cam->ProcessMovement(RIGHT, time->unscaledTimeDelta);
 			break;
 		case SDLK_R:
-			cam->ProcessKeyboard(UP, time->unscaledTimeDelta);
+			cam->ProcessMovement(UP, time->unscaledTimeDelta);
 			break;
 		case SDLK_F:
-			cam->ProcessKeyboard(DOWN, time->unscaledTimeDelta);
+			cam->ProcessMovement(DOWN, time->unscaledTimeDelta);
 			break;
 		default:
 			break;

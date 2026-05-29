@@ -1,7 +1,7 @@
 #include "Camera.hpp"
 
 
-void Camera::ProcessKeyboard(cameraMovement direction, double timeDelta)
+void Camera::ProcessMovement(cameraMovement direction, double timeDelta)
 {
 	float velocity = movementSpeed * 10.f * timeDelta;
 
@@ -35,7 +35,7 @@ void Camera::ProcessKeyboard(cameraMovement direction, double timeDelta)
 	dirty = true;
 }
 
-void Camera::ProcessMouse(double xOffset, double yOffset)
+void Camera::ProcessLook(double xOffset, double yOffset)
 {
 
 }
