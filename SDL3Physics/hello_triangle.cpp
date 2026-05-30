@@ -172,14 +172,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	mainScene = SceneManagement::CreateScene(device);
 	Entity* camEntity = SceneManagement::CreateEntity(mainScene);
-	camEntity->position = sgm::vec3(0, 0, -30);
+	camEntity->position = sgm::vec3(0, -1.2, -5); //-30 for NDA, -200 for physics demo
 	Application::GetInstance()->mainCamera = Camera(camEntity);
 	Application::GetInstance()->mainCamera.projMat = dataArray[0];
 
 	/*
-	for (int i = -25; i < 25; ++i)
+	for (int i = -20; i < 20; ++i)
 	{
-		if (i == 0) continue;
+		//if (i == 0) continue;
 		for (int j = -20; j < 20; ++j)
 		{
 			Entity* entity = SceneManagement::CreateEntity(mainScene);
@@ -187,29 +187,30 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 			entity->position = sgm::vec3(i * 3, j*3, 0);
 			entity->renderable = true;
 			entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/ambulance.obj";
-			entity->Update = &Rotator;
+			entity->Update;// = &Rotator;
 			entity->hasPhysics = true;
-			entity->hasCollision = true;
+			entity->hasCollision = false;
 			entity->velocity = sgm::vec3(0, 30, 0);
+			entity->hasGravity = true;
 			if (i == 0)
 			{
-				entity->hasGravity = true;
+				
 			}
 			if (i % 2 == 0)
 			{
 				entity->velocity += sgm::vec3(i, 0, -i / 2);
 			}
 			else {
-				entity->velocity += sgm::vec3(i, i, 4);
+				entity->velocity += sgm::vec3(i, i*j, j);
 			}
 
-			entity->axis = sgm::vec3(i / 3, i * j, i);
+			entity->axis = sgm::vec3(i / 3, j * 3, i*j);
 		}
-	} */
+	}
 	
-
+	*/
 	//devkit demo (for match-up):
-	
+	/*
 	for (int j = -5; j < 6; ++j)
 	{
 		for (int i = -5; i < 6; i++)
@@ -225,19 +226,22 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 			entity->axis = sgm::vec3(i/2, j*2, j*i);
 		}
 	}
-	/*
+	*/
+	
+	
+	//taxi, ambulance, truck, van, tractor-police, sedan, sedan-sports, race-future, hatchback-sports, firetruck
 	
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
-	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/taxi.obj";
+	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/firetruck.obj";
 	entity->name = "taxi";
-	entity->position = sgm::vec3(1.f);
-	entity->scale = sgm::vec3(1.f);
+	entity->position = sgm::vec3(0.f);
+	//entity->scale = sgm::vec3(1.f);
 	entity->renderable = true;
 	//entity->hasGravity = true;
 	entity->hasCollision = true;
 	entity->hasPhysics = true;
 	entity->Update = &Rotator;
-
+	
 	entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/suv-luxury.obj";
 	entity->name = "SUV";
@@ -259,7 +263,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	entity->hasCollision = true;
 	entity->hasGravity = true;
 	//entity->Update = &Rotator;
-	*/
+	
 	SceneManagement::LoadSceneResources(mainScene, commandBuffer);
 
 
