@@ -33,18 +33,27 @@ private:
 	static std::mutex mutex_;
 
 protected:
-	Application() : GFXPipeline(nullptr) {};
+	Application() : GFXPipeline(nullptr), Device(nullptr), Window(nullptr)  {};
+	~Application();
 
 public:
 	Application(Application& other) = delete;
 	void operator=(const Application&) = delete;
 	static Application* GetInstance();
 
+	void Init(SDL_GPUDevice* device, uint32_t width, uint32_t height, SDL_Window* window);
 
-	SDL_GPUGraphicsPipeline* GFXPipeline;
+	SDL_GPUDevice* Device; //all GPU work will depend on this
+	SDL_GPUGraphicsPipeline* GFXPipeline; //this should be moved elsewhere? or should be Pipeline Type
+	
+	uint32_t WindowWidth = 1920;
+	uint32_t WindowHeight = 1080;
+	SDL_Window* Window;
+	
 	Clock Time;
 	Camera mainCamera;
-
+	
+	SDL_GPUTexture* DepthTexture;
 
 	SDL_GPUColorTargetInfo colorInfo = {};
 	SDL_GPUColorTargetInfo backgroundInfo = {};

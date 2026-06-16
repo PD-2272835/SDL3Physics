@@ -12,7 +12,7 @@
 #define MAX_ENTITIES 2048
 
 
-//Idk where else to put this
+//Idk where else to put this - It's in scene.hpp btw
 struct UniformBuffer
 {
 	sgm::mat4 View;

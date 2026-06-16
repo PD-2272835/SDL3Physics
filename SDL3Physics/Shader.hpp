@@ -12,6 +12,7 @@ public:
 	Shader(SDL_GPUDevice* device, void* code, size_t codeSize, Uint32 format, SDL_GPUShaderStage stage, Uint32 samplers = 0, Uint32 storageBuffers = 0, Uint32 storageTextures = 0, Uint32 uniformBuffers = 0);
 	Shader(SDL_GPUDevice* device, const char* filePath, Uint32 format, SDL_GPUShaderStage stage, Uint32 samplers = 0, Uint32 storageBuffers = 0, Uint32 storageTextures = 0, Uint32 uniformBuffers = 0);
 
+	~Shader() { this->Delete(); }
 	void Delete();
 };
 #endif

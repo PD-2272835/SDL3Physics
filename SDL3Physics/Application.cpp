@@ -14,4 +14,16 @@ Application* Application::GetInstance()
 	return pInstance_;
 }
 
+void Application::Init(SDL_GPUDevice* device, uint32_t width, uint32_t height, SDL_Window* window)
+{
+	Device = device;
+	WindowWidth = width;
+	WindowHeight = height;
+	Window = window;
+}
 
+
+Application::~Application()
+{
+	
+}
