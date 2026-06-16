@@ -16,7 +16,7 @@ Shader::Shader(SDL_GPUDevice* device, void* code, size_t codeSize, Uint32 format
 		storageTextures, 
 		uniformBuffers
 	};
-	ID = SDL_CreateGPUShader(Device, &Info);
+	Handle = SDL_CreateGPUShader(Device, &Info);
 }
 
 //Create Shader from file path with SDL_LoadFile
@@ -35,7 +35,7 @@ Shader::Shader(SDL_GPUDevice* device, const char* filePath, Uint32 format, SDL_G
 	Info.num_storage_textures = storageTextures;
 	Info.num_uniform_buffers = uniformBuffers;
 
-	ID = SDL_CreateGPUShader(Device, &Info);
+	Handle = SDL_CreateGPUShader(Device, &Info);
 	SDL_free(code);
 }
 
@@ -43,6 +43,6 @@ Shader::Shader(SDL_GPUDevice* device, const char* filePath, Uint32 format, SDL_G
 //this object should not be used after Delete is called
 void Shader::Delete()
 {
-	SDL_ReleaseGPUShader(Device, ID);
+	SDL_ReleaseGPUShader(Device, Handle);
 	Device = nullptr;
 }

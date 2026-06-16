@@ -20,6 +20,6 @@ std::vector<Internal_FaceIndex> ParseObjFace(std::string line);
 Internal_FaceIndex ParseFaceIndex(std::string line);
 
 std::shared_ptr<Mesh> LoadObj(const char* path);
-Asset LoadTexture(const char* path);
+std::shared_ptr<Texture> LoadTexture(const char* path);
 
 #endif

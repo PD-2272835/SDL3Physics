@@ -17,6 +17,7 @@
 #include "Scene.hpp"
 #include "Application.hpp"
 #include "bvh.hpp"
+#include "Pipeline.hpp"
 
 SDL_Window* window;
 SDL_GPUDevice* device;
@@ -26,7 +27,7 @@ SDL_GPUGraphicsPipeline* graphicsPipeline;
 Scene* mainScene;
 
 
-SDL_GPUTexture* swapchainTexture; //RenderTarget equivalent (frame buffer)
+SDL_GPUTexture* swapchainTexture;
 
 Uint32 Width = 1920;
 Uint32 Height = 1080;
@@ -53,6 +54,8 @@ void Rotator(Entity* entity)
 }
 
 
+GFXPipeline pipeline;
+
 //AppInit is called at the very start of program execution
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 {
@@ -74,11 +77,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	//using Vulkan/NDA platform for shaders - Vulkan allows use of SDL_Shadercross (portability between platforms)
 	device = SDL_CreateGPUDevice(PLATFORM_TARGET_TYPE, true, NULL);
+	Application::GetInstance()->Init(device, Width, Height, window);
+	
+	
 	SDL_ClaimWindowForGPUDevice(device, window);
 
 	Shader vertexShader(device, "shaderSource/default_vert.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1, 0, 1);
 	Shader fragmentShader(device, "shaderSource/default_frag.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_FRAGMENT);
-
+	
 	//describing the vertex buffers
 	SDL_GPUVertexBufferDescription vertexBufferDescriptions[1];
 	vertexBufferDescriptions[0].slot = 0;
@@ -118,8 +124,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	//Creating a Graphics Pipeline
 	SDL_GPUGraphicsPipelineCreateInfo pipelineInfo{};
-	pipelineInfo.vertex_shader = vertexShader.ID;//bind shaders
-	pipelineInfo.fragment_shader = fragmentShader.ID;
+	pipelineInfo.vertex_shader = vertexShader.Handle;//bind shaders
+	pipelineInfo.fragment_shader = fragmentShader.Handle;
 
 	pipelineInfo.vertex_input_state.num_vertex_buffers = 1;
 	pipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDescriptions;
@@ -133,10 +139,10 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//depth testing
 	
 	const SDL_GPUTextureFormat depthFormat = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
-		/*SDL_GPUTextureSupportsFormat(device,
-		SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET) 
-		? SDL_GPU_TEXTUREFORMAT_D32_FLOAT : SDL_GPU_TEXTUREFORMAT_D16_UNORM; //use float if supported
-	*/
+	//SDL_GPUTextureSupportsFormat(device,
+		//SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET) 
+		//? SDL_GPU_TEXTUREFORMAT_D32_FLOAT : SDL_GPU_TEXTUREFORMAT_D16_UNORM; //use float if supported
+
 	SDL_GPUTextureCreateInfo depthTexInfo = {};
 	depthTexInfo.format = depthFormat;
 	depthTexInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
@@ -155,9 +161,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	//output buffers
 	pipelineInfo.target_info.num_color_targets = 1;
 	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
-
-
-	Application::GetInstance()->GFXPipeline = SDL_CreateGPUGraphicsPipeline(device, &pipelineInfo);
+	
+	Application::GetInstance()->GFXPipeline = SDL_CreateGPUGraphicsPipeline(Application::GetInstance()->Device, &pipelineInfo);
 
 	vertexShader.Delete();
 	fragmentShader.Delete();
@@ -272,6 +277,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
 	return SDL_APP_CONTINUE;
 }
+
 
 //AppIterate is called every frame/background update - roughly equivalent to Unity's `Update()` callback
 SDL_AppResult SDL_AppIterate(void *appstate)

@@ -8,7 +8,7 @@ Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
 		size, //size of buffer in bytes
 		0 //extension properties
 	};
-	ID = SDL_CreateGPUBuffer(Device, &Info);
+	Handle = SDL_CreateGPUBuffer(Device, &Info);
 	End = 0; //tail of buffer data in bytes
 }
 
@@ -40,7 +40,7 @@ bool Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 
 	//Upload the full size of the transfer buffer to this buffer, 
 	//starting from the user-provided byte offset into this buffer
-	SDL_GPUBufferRegion region{ID, destinationOffset, dataSize};
+	SDL_GPUBufferRegion region{Handle, destinationOffset, dataSize};
 
 	SDL_UploadToGPUBuffer(copyPass, &location, &region, false);
 	
@@ -53,7 +53,7 @@ bool Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 data
 
 void Buffer::Delete()
 {
-	SDL_ReleaseGPUBuffer(Device, ID);
+	SDL_ReleaseGPUBuffer(Device, Handle);
 	Device = nullptr;
 	Info = {};
 }

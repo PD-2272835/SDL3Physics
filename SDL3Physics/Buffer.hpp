@@ -8,15 +8,15 @@ class Buffer
 public:
 	SDL_GPUBufferCreateInfo Info;
 	SDL_GPUDevice* Device;
-	SDL_GPUBuffer* ID;
+	SDL_GPUBuffer* Handle;
 	size_t End;
 
-	Buffer() : Info({}), Device(nullptr), ID(nullptr), End(0) {};
+	Buffer() : Info({}), Device(nullptr), Handle(nullptr), End(0) {};
 	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
 
 
 	bool UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
-	//void* DownloadData(Uint32 size); TODO
+	//void* DownloadData(SDL_GPUCommandBuffer* cmdBuffer, Uint32 dataOffset, Uint32 size); TODO
 	
 
 	//TODO: Bind and unbind - maybe make these virtual,

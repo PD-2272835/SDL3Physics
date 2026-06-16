@@ -154,11 +154,11 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 	Application* App = Application::GetInstance();
 
 	SDL_GPUBufferBinding vertexBindings[1];
-	vertexBindings[0].buffer = scene->vertexBuffer.ID;
+	vertexBindings[0].buffer = scene->vertexBuffer.Handle;
 	vertexBindings[0].offset = 0;
 
 	SDL_GPUBufferBinding indexBindings[1];
-	indexBindings[0].buffer = scene->indexBuffer.ID;
+	indexBindings[0].buffer = scene->indexBuffer.Handle;
 	indexBindings[0].offset = 0;
 
 
@@ -173,7 +173,7 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 	SDL_BindGPUGraphicsPipeline(renderPass, App->GFXPipeline);
 
 	//bind all the scene's buffers
-	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &App->vSSBO.ID, 1); // "slot" corresponds to "binding" in the shader
+	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &App->vSSBO.Handle, 1); // "slot" corresponds to "binding" in the shader
 	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
 	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 

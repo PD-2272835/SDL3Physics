@@ -4,6 +4,7 @@
 #include <vec.hpp>
 #include <vector>
 #include "Intersections.hpp"
+#include "SDL3/SDL_gpu.h"
 
 
 struct GFXHandle
@@ -16,9 +17,11 @@ struct GFXHandle
 	//THIS DOES NOT YET MANAGE TEXTURES
 };
 
-struct Asset
+class Asset
 {
 	GFXHandle handle = {};
+	virtual void LoadFromDisk() = 0;
+	virtual void UploadToGPU() = 0;
 };
 
 
@@ -45,14 +48,9 @@ enum TextureType
 
 struct Texture : Asset
 {
-	uint32_t ID;
-	void* TexData;
+	SDL_GPUTexture* Handle;
+	SDL_GPUTextureCreateInfo Info;
 	TextureType type;
-
-	~Texture()
-	{
-		delete[] TexData;
-	}
 };
 
 

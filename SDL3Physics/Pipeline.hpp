@@ -9,15 +9,14 @@
 class GFXPipeline
 {
 public:
-	SDL_GPUGraphicsPipelineCreateInfo Info;
-	SDL_GPUGraphicsPipeline* ID;
-	//bool hasDepthTexture;
+	SDL_GPUGraphicsPipelineCreateInfo Info{};
+	SDL_GPUGraphicsPipeline* Handle = nullptr;
 
 	
-	GFXPipeline() : Info({}), ID() {};
-	GFXPipeline(const GFXPipeline& other) : Info(other.Info), ID(other.ID) {};
-	GFXPipeline(SDL_GPUGraphicsPipelineCreateInfo* info) : Info(*info), ID(SDL_CreateGPUGraphicsPipeline(Application::GetInstance()->Device, &Info)) {};
-
+	GFXPipeline() {};
+	GFXPipeline(const GFXPipeline& other) : Info(other.Info), Handle(other.Handle) {};
+	GFXPipeline(SDL_GPUGraphicsPipelineCreateInfo* info) : Info(*info), Handle(SDL_CreateGPUGraphicsPipeline(Application::GetInstance()->Device, &Info)) {};
+	GFXPipeline(Shader* vShader, Shader* fShader);
 	GFXPipeline(const Shader* vShader, const Shader* fShader, const SDL_GPURasterizerState* rState, const SDL_GPUPrimitiveType primitiveType = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
 		const SDL_GPUVertexInputState* vInputState = nullptr, const SDL_GPUMultisampleState* msState = nullptr, const SDL_GPUDepthStencilState* dsState = nullptr, const SDL_GPUGraphicsPipelineTargetInfo* tInfo = nullptr, const SDL_PropertiesID extensionProps = 0);
 	
@@ -26,7 +25,7 @@ public:
 
 
 
-	~GFXPipeline() { if (ID != nullptr) {SDL_ReleaseGPUGraphicsPipeline(Application::GetInstance()->Device, ID);} };
+	~GFXPipeline() { if (Handle != nullptr) {SDL_ReleaseGPUGraphicsPipeline(Application::GetInstance()->Device, Handle);} };
 };
 
 #endif

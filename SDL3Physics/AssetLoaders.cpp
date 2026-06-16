@@ -151,8 +151,13 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 }
 
 
-Asset LoadTexture(const char* path)
+std::shared_ptr<Texture> LoadTexture(const char* path)
 {
-	Asset r;
-	return r;
+
+
+	//Handle = SDL_CreateGPUTexture()
+
+
+	std::shared_ptr<Texture> texture(new Texture());
+	return texture;
 }

@@ -26,7 +26,7 @@ std::shared_ptr<Asset> AssetManagement::GetAsset(const std::string& AssetPath)
 			return res;
 		}
 	}
-	std::cout << "Loading Asset\n";
+	std::cout << "Loading Assets on CPU-side\n";
 
 	//Asset not loaded
 	std::shared_ptr<Asset> res = AssetManagement::LoadAsset(AssetPath); //create new entry/update Asset Entry
@@ -45,7 +45,7 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const std::string& AssetPath)
 		if (p.extension() == ".png")
 		{
 			//TODO: load image/texture
-
+			return LoadTexture(AssetPath.c_str());
 		}
 		else if (p.extension() == ".obj") {
 			return LoadObj(AssetPath.c_str());
