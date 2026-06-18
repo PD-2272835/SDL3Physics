@@ -28,6 +28,10 @@ public:
 	std::shared_ptr<Asset> GetAsset(const std::string& AssetPath);
 	std::shared_ptr<Asset> LoadAsset(const std::string& AssetPath);
 
+
+	bool RegisterResource(const std::string& key, const std::shared_ptr<Asset> ref); //something something, asset bundles
+
+
 };
 
 #endif

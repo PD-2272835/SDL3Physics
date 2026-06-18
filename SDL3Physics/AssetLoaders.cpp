@@ -65,11 +65,24 @@ std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
 	return res;
 }
 
-std::shared_ptr<Mesh> LoadObj(const char* path)
+
+
+bool Texture::LoadFromDisk(const char* filepath)
+{
+	return false;
+}
+
+bool Texture::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* textureBuffer, Buffer* vertexBuffer, Buffer* indexBuffer)
+{
+	return false;
+}
+
+
+bool Mesh::LoadFromDisk(const char* filepath)
 {
 	size_t size;
 	size_t startOffset = 0;
-	void* file = SDL_LoadFile(path, &size);
+	void* file = SDL_LoadFile(filepath, &size);
 
 	std::vector<sgm::vec3> positions;
 	std::vector<sgm::vec2> uvs;
@@ -125,39 +138,78 @@ std::shared_ptr<Mesh> LoadObj(const char* path)
 				break;
 			}
 		}
-		
+
 		SDL_free(file);
-
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
-		std::vector<Texture*> textures;
-
 
 		//fill data into model
 		for (size_t i = 0; i < faces.size(); ++i)
 		{
 			Internal_FaceIndex face = faces.at(i);
-			vertices.emplace_back(positions.at(face.data[0]),
+			Vertices.emplace_back(positions.at(face.data[0]),
 				normals.at(face.data[2]),
 				uvs.at(face.data[1]));
-			indices.emplace_back(i); //casts i to uint32_t
+			Indices.emplace_back(static_cast<uint32_t>(i)); //casts i to uint32_t
 		}
 
-		std::shared_ptr<Mesh> model(new Mesh(vertices, indices, textures, bounds)); //create a dynamically allocated smart ptr to the resulting model
-		return model;
+		//std::shared_ptr<Mesh> model(this); //create a smart ptr to the resulting model
+		//return shared_from_this();
+		return true;
 	}
 
-	return nullptr;
+	return false;
+	//return nullptr;
 }
 
-
-std::shared_ptr<Texture> LoadTexture(const char* path)
+bool Mesh::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* tBuffer, Buffer* vBuffer, Buffer* iBuffer)
 {
+	if (Handle.isGfxInitialized) return false; //do not upload duplicate models, especially if they are still in scope
+	if (vBuffer == nullptr || iBuffer == nullptr) return false; //guard against no buffer provided
+	
+	bool uploadCheck = true;
+
+	if (uploadCheck)
+	{
+		Handle.vertexBuffer = {
+			vBuffer,
+			this->Vertices.size(),
+			vBuffer->End / sizeof(Vertex)
+		};
+		uploadCheck = vBuffer->UploadData(cmdBuffer, (void*)this->Vertices.data(), Handle.vertexBuffer.size * sizeof(Vertex), vBuffer->End);
+	}
+
+	if (uploadCheck)
+	{
+		Handle.indexBuffer = {
+			iBuffer,
+			this->Indices.size(),
+			iBuffer->End / sizeof(uint32_t)
+		};
+		uploadCheck = iBuffer->UploadData(cmdBuffer, (void*)this->Indices.data(), Handle.vertexBuffer.size * sizeof(uint32_t), iBuffer->End);
+	}
+
+	if (tBuffer != nullptr)
+	{
+		for (size_t i = 0; i < this->Textures.size(); i++)
+		{
+			//FIXME: what if the texture buffer runs out of space after uploading one or more texture?
+			if(uploadCheck) uploadCheck = Textures.at(i)->UploadToGPU(cmdBuffer, tBuffer);
+		}
+	}
+
+	Handle.isGfxInitialized = uploadCheck;
+	return uploadCheck;
+
+	//add the buffers and other data to the buffer handles array
+	
+	//do the uploading
+
+	//draw call centric - Draws happen multiple times per frame
+	//divisions are *slightly* slower than multiplications, so better to store the offset in strides of vertices
+	//uploadCheck |= handle.buffer->UploadData(cmd, this->Vertices.data(), handle.size * sizeof(Vertex), handle.buffer->End);
 
 
-	//Handle = SDL_CreateGPUTexture()
+	//draw call centric - Draws happen multiple times per frame
+	//divisions are *slightly* slower than multiplications, so better to store the offset in strides of indices
+	//uploadCheck |= handle.buffer->UploadData(cmd, this->Indices.data(), this->Indices.size() * sizeof(uint32_t), handle.buffers.at(1).buffer->End);
 
-
-	std::shared_ptr<Texture> texture(new Texture());
-	return texture;
 }

@@ -12,10 +12,10 @@ public:
 	size_t End;
 
 	Buffer() : Info({}), Device(nullptr), Handle(nullptr), End(0) {};
-	Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size);
+	Buffer(SDL_GPUDevice* device, uint8_t usage, size_t size);
 
 
-	bool UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset);
+	bool UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, size_t dataSize, size_t destinationOffset);
 	//void* DownloadData(SDL_GPUCommandBuffer* cmdBuffer, Uint32 dataOffset, Uint32 size); TODO
 	
 

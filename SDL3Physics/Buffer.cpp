@@ -1,11 +1,11 @@
 #include "Buffer.hpp"
 
-Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
+Buffer::Buffer(SDL_GPUDevice* device, uint8_t usage, size_t size)
 {
 	Device = device;
 	Info = {
 		usage, //buffer usage
-		size, //size of buffer in bytes
+		static_cast<Uint32>(size), //size of buffer in bytes
 		0 //extension properties
 	};
 	Handle = SDL_CreateGPUBuffer(Device, &Info);
@@ -15,7 +15,7 @@ Buffer::Buffer(SDL_GPUDevice* device, Uint8 usage, Uint32 size)
 
 //dataSize = size of data in bytes
 //destinationOffset = offset of data into the buffer in bytes
-bool Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, Uint32 dataSize, Uint32 destinationOffset)
+bool Buffer::UploadData(SDL_GPUCommandBuffer* cmdBuffer, void* data, size_t dataSize, size_t destinationOffset)
 {
 	if (End + dataSize > Info.size) //check that there is space in this buffer
 	{

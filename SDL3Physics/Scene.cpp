@@ -193,9 +193,9 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 
 void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* renderPass, Scene* scene, Entity& entity)
 {	
-	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->handle;
+	GFXHandle* handle = &AssetManagement::GetInstance()->GetAsset(entity.meshPath.data()).get()->Handle;
 
-	if (handle->gfxInitialized)
+	if (handle->isGfxInitialized)
 	{
 		//push UniformData 
 		sgm::mat4 model = sgm::mat4(1.f);
@@ -216,7 +216,7 @@ void SceneManagement::DrawEntity(SDL_GPUCommandBuffer* cmd, SDL_GPURenderPass* r
 		SDL_PushGPUVertexUniformData(cmd, 0, &uniformData, sizeof(uniformData));
 
 		//Draw this Entity
-		SDL_DrawGPUIndexedPrimitives(renderPass, handle->indexSize, 1, handle->indexOffset, handle->vertexOffset, 0);
+		SDL_DrawGPUIndexedPrimitives(renderPass, handle->indexBuffer.size, 1, handle->indexBuffer.offset, handle->vertexBuffer.offset, 0);
 	}
 
 }
@@ -226,7 +226,7 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 {
 	if (entity.allocated && entity.renderable)
 	{
-		std::shared_ptr<Asset> ref = AssetManagement::GetInstance()->GetAsset(entity.meshPath.c_str()); //intermediate step to store 
+		std::shared_ptr<Asset> ref = AssetManagement::GetInstance()->GetAsset(entity.meshPath.c_str()); 
 		
 		if (ref == nullptr) //guard against invalid file path
 		{
@@ -234,34 +234,9 @@ void SceneManagement::LoadEntityResources(Scene* scene, SDL_GPUCommandBuffer* cm
 			return;
 		}
 
-		scene->assetRefs.push_back(ref);
+		scene->assetRefs.push_back(ref); //FIXME, this should only happen for asset bundles
 
-		//we can assume that the returned pointer is a mesh as we are using a path to a 3D model uwu
-		//this should be changed if loading an obj or other 3D model returns a different struct
-		Mesh* mesh = static_cast<Mesh*>(ref.get());
-		if (mesh->handle.gfxInitialized)
-		{
-			return; //do not upload model to GPU if already in GPU memory
-		}
-		GFXHandle handle;
-		bool uploadCheck = false;
-
-		//draw call centric - Draws happen multiple times per frame
-		//divisions are *slightly* slower than multiplications, so better to store the offset in strides of vertices
-		handle.vertexOffset = scene->vertexBuffer.End / sizeof(Vertex); 
-		handle.vertexSize = mesh->Vertices.size();
-		uploadCheck |= scene->vertexBuffer.UploadData(cmd, (void*)mesh->Vertices.data(), handle.vertexSize * sizeof(Vertex), scene->vertexBuffer.End);
-
-
-		//draw call centric - Draws happen multiple times per frame
-		//divisions are *slightly* slower than multiplications, so better to store the offset in strides of indices
-		handle.indexOffset = scene->indexBuffer.End / sizeof(uint32_t);
-		handle.indexSize = mesh->Indices.size();
-		uploadCheck |= scene->indexBuffer.UploadData(cmd, (void*)mesh->Indices.data(), handle.indexSize * sizeof(uint32_t), scene->indexBuffer.End);
-
-		handle.gfxInitialized = uploadCheck;
-
-		ref.get()->handle = handle;
+		ref.get()->UploadToGPU(cmd, nullptr, &scene->vertexBuffer, &scene->indexBuffer);
 	}
 }
 

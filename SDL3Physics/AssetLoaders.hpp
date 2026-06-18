@@ -12,14 +12,14 @@ struct Internal_FaceIndex
 	Uint32 data[3]{};
 };
 
-
+//Helper fucntions for obj parsing
 std::string GetLineIter(const char* dataStream, const size_t& size, size_t& start);
 
 template<size_t dim> sgm::vec<dim, float> ParseObjVector(std::string line);
+
 std::vector<Internal_FaceIndex> ParseObjFace(std::string line);
+
 Internal_FaceIndex ParseFaceIndex(std::string line);
 
-std::shared_ptr<Mesh> LoadObj(const char* path);
-std::shared_ptr<Texture> LoadTexture(const char* path);
 
 #endif

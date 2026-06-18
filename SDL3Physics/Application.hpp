@@ -53,7 +53,7 @@ public:
 	Clock Time;
 	Camera mainCamera;
 	
-	SDL_GPUTexture* DepthTexture;
+	SDL_GPUTexture* DepthTexture = nullptr;
 
 	SDL_GPUColorTargetInfo colorInfo = {};
 	SDL_GPUColorTargetInfo backgroundInfo = {};
