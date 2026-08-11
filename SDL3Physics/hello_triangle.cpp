@@ -239,7 +239,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	Entity* entity = SceneManagement::CreateEntity(mainScene);
 	entity->meshPath = "C:/Users/eater/Desktop/KenneyCarsOBJ/firetruck.obj";
 	entity->name = "taxi";
-	entity->position = sgm::vec3(0.f);
+	entity->position = sgm::vec3(1.f, 0.f, 1.f);
 	//entity->scale = sgm::vec3(1.f);
 	entity->renderable = true;
 	//entity->hasGravity = true;

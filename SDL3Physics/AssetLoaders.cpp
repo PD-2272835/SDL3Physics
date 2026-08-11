@@ -16,7 +16,7 @@ std::string GetLineIter(const char* dataStream, const size_t &size, size_t &star
 			break;
 		}
 	}
-	start += r.length() + 2; //FIXME sometimes /n and /r are used in different combinations based on operating system
+	start += r.length() + 2; //FIXME sometimes /n and /r are used in different combinations based on operating system/editor that saved the file
 	return r;
 }
 

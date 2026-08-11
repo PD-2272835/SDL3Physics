@@ -49,7 +49,7 @@ sgm::mat4 Camera::GetMatrix()
 {
 	if (dirty)
 	{
-		std::cout << "updated view mat\n";
+		//std::cout << "updated view mat\n";
 		viewMat = sgm::mul(projMat, sgm::View(right, up, front, m_entity->position));
 		dirty = false;
 	}

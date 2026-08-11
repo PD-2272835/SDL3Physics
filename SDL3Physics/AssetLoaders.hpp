@@ -1,12 +1,13 @@
 #ifndef _ASSET_LOADERS_HPP_
 #define _ASSET_LOADERS_HPP_
 #include <SDL3/SDL_iostream.h>
-#include <vector>
-#include <vec.hpp>
-#include "AssetTypes.hpp"
+#include <vector> //lists
+#include <vec.hpp> //sgm mathematical vectors
+#include "AssetTypes.hpp" //defininitions for Texture and other asset variations
 #include "Intersections.hpp"
 #include <string>
 
+//this is bad - dirties intellisense/autocomplete
 struct Internal_FaceIndex
 {
 	Uint32 data[3]{};
