@@ -4,6 +4,7 @@
 #include <vector> //lists
 #include <vec.hpp> //sgm mathematical vectors
 #include "AssetTypes.hpp" //defininitions for Texture and other asset variations
+#include "SDL3_image/SDL_image.h"
 #include "Intersections.hpp"
 #include <string>
 

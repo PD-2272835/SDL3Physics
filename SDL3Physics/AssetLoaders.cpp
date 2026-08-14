@@ -69,7 +69,22 @@ std::vector<Internal_FaceIndex> ParseObjFace(std::string line)
 
 bool Texture::LoadFromDisk(const char* filepath)
 {
-	return false;
+	SDL_Surface* loadedImage = IMG_Load(filepath);
+	if (loadedImage == nullptr)
+	{
+		return false;
+	}
+
+
+	if (loadedImage->format != SDL_PIXELFORMAT_ABGR8888)
+	{
+		surface = SDL_ConvertSurface(loadedImage, SDL_PIXELFORMAT_ABGR8888);
+	}
+	else {
+		surface = loadedImage;
+	}
+
+	return true;
 }
 
 bool Texture::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* textureBuffer, Buffer* vertexBuffer, Buffer* indexBuffer)

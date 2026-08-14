@@ -67,8 +67,13 @@ enum TextureType
 
 struct Texture : Asset
 {
+	SDL_GPUTextureCreateInfo textureInfo = {};
+	SDL_GPUSamplerCreateInfo samplerInfo = {};
+
 	SDL_GPUTexture* texHandle = nullptr;
-	SDL_GPUTextureCreateInfo Info = {};
+	SDL_GPUSampler* sampler = {};
+
+	SDL_Surface* surface = {};
 	TextureType type = Diffuse;
 
 	Texture() {};
