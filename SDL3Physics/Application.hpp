@@ -53,6 +53,17 @@ public:
 	Clock Time;
 	Camera mainCamera;
 	
+	SDL_GPUSamplerCreateInfo samplerInfo{			//Default Sampler Settings
+		SDL_GPU_FILTER_NEAREST,						//min_filter
+		SDL_GPU_FILTER_NEAREST,						//mag_filter
+		SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,			//mipmap_mode
+		SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,	//address_mode_u
+		SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,	//address_mode_v
+		SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE	//address_mode_w
+	};
+
+	SDL_GPUSampler* diffuseSampler = nullptr;
+
 	SDL_GPUTexture* DepthTexture = nullptr;
 
 	SDL_GPUColorTargetInfo colorInfo = {};

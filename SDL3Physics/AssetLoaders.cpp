@@ -87,10 +87,27 @@ bool Texture::LoadFromDisk(const char* filepath)
 	return true;
 }
 
-bool Texture::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* textureBuffer, Buffer* vertexBuffer, Buffer* indexBuffer)
+bool Texture::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, Buffer* textureBuffer, Buffer* vertexBuffer, Buffer* indexBuffer)
 {
-	return false;
+	SDL_assert(surface != nullptr);
+
+	textureInfo = {
+		SDL_GPU_TEXTURETYPE_2D,					// type
+		SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,	// format
+		SDL_GPU_TEXTUREUSAGE_SAMPLER,			// usage
+		static_cast<Uint32>(surface->w),		// width
+		static_cast<Uint32>(surface->h),		// height
+		1,										// layer_count_or_depth
+		1										// num_levels
+	};
+	
+	texHandle = textureBuffer->UploadTexture(cmdBuffer, surface, textureInfo);
+	if (texHandle == nullptr) return false;
+
+	//sampler = SDL_CreateGPUSampler();
+	return true;
 }
+
 
 
 bool Mesh::LoadFromDisk(const char* filepath)
@@ -175,7 +192,7 @@ bool Mesh::LoadFromDisk(const char* filepath)
 	//return nullptr;
 }
 
-bool Mesh::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* tBuffer, Buffer* vBuffer, Buffer* iBuffer)
+bool Mesh::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, Buffer* tBuffer, Buffer* vBuffer, Buffer* iBuffer)
 {
 	if (Handle.isGfxInitialized) return false; //do not upload duplicate models, especially if they are still in scope
 	if (vBuffer == nullptr || iBuffer == nullptr) return false; //guard against no buffer provided
@@ -202,14 +219,15 @@ bool Mesh::UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* tBuffer, B
 		uploadCheck = iBuffer->UploadData(cmdBuffer, (void*)this->Indices.data(), Handle.vertexBuffer.size * sizeof(uint32_t), iBuffer->End);
 	}
 
-	if (tBuffer != nullptr)
+	if (uploadCheck)
 	{
 		for (size_t i = 0; i < this->Textures.size(); i++)
 		{
 			//FIXME: what if the texture buffer runs out of space after uploading one or more texture?
-			if(uploadCheck) uploadCheck = Textures.at(i)->UploadToGPU(cmdBuffer, tBuffer);
+			if (uploadCheck) uploadCheck = Textures.at(i)->UploadToGPU(cmdBuffer, tBuffer);
 		}
 	}
+	
 
 	Handle.isGfxInitialized = uploadCheck;
 	return uploadCheck;

@@ -161,6 +161,9 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 	indexBindings[0].buffer = scene->indexBuffer.Handle;
 	indexBindings[0].offset = 0;
 
+	SDL_GPUTextureSamplerBinding textureBindings[1];
+	textureBindings->texture = AssetManagement::GetInstance()->GetAsset("C:\\Users\\eater\\Desktop\\KenneyCarsOBJ\\Textures\\colormap.png").Handle
+
 
 	SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(
 		cmd,
@@ -176,6 +179,7 @@ void SceneManagement::DrawScene(SDL_GPUCommandBuffer* cmd, Scene* scene)
 	SDL_BindGPUVertexStorageBuffers(renderPass, 0, &App->vSSBO.Handle, 1); // "slot" corresponds to "binding" in the shader
 	SDL_BindGPUVertexBuffers(renderPass, 0, vertexBindings, 1);
 	SDL_BindGPUIndexBuffer(renderPass, indexBindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+	SDL_BindGPUFragmentSamplers(renderPass, 0, )
 
 
 	for (size_t i = 0; i < scene->maxEntities; ++i)

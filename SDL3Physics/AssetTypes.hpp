@@ -20,9 +20,9 @@ struct BufferHandle
 struct GFXHandle
 {
 	//std::vector<BufferHandle> buffers = {}; //buffers where this data is stored
-	BufferHandle textureBuffer = {};
-	BufferHandle vertexBuffer = {};
-	BufferHandle indexBuffer = {};
+	BufferHandle vertexBuffer{};
+	BufferHandle indexBuffer{};
+	SDL_GPUTexture* texture = nullptr;
 	bool isGfxInitialized = false; //has this resource been loaded onto the GPU?
 };
 
@@ -34,12 +34,12 @@ public:
 	//I strongly dislike this syntax for abstract functions
 	//Concrete definitions are in AssetLoaders.hpp
 	virtual bool LoadFromDisk(const char* filename) = 0;
-	virtual bool UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) = 0;
+	virtual bool UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) = 0;
 
 	virtual ~Asset()
 	{
-		//TODO: remove from GPU upon deletion? 
-		//buffers will be cleared after program execution, however long runtimes could cause issues
+		//remove from GPU upon deletion
+		//buffers will be cleared after program execution, however long runtimes with lots of different assets could cause issues
 	};
 };
 
@@ -67,19 +67,18 @@ enum TextureType
 
 struct Texture : Asset
 {
-	SDL_GPUTextureCreateInfo textureInfo = {};
-	SDL_GPUSamplerCreateInfo samplerInfo = {};
+	SDL_GPUTextureCreateInfo textureInfo{};
+	SDL_GPUSamplerCreateInfo samplerInfo{};
 
 	SDL_GPUTexture* texHandle = nullptr;
-	SDL_GPUSampler* sampler = {};
 
-	SDL_Surface* surface = {};
+	SDL_Surface* surface = nullptr;
 	TextureType type = Diffuse;
 
 	Texture() {};
 
 	bool LoadFromDisk(const char* filepath) override;
-	bool UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, const Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) override;
+	bool UploadToGPU(SDL_GPUCommandBuffer* cmdBuffer, Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) override;
 
 	~Texture()
 	{
@@ -113,7 +112,7 @@ struct Mesh : Asset
 	~Mesh() {};
 
 	bool LoadFromDisk(const char* filepath) override;
-	bool UploadToGPU(SDL_GPUCommandBuffer* cmd, const Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) override;
+	bool UploadToGPU(SDL_GPUCommandBuffer* cmd, Buffer* textureBuffer, Buffer* vertexBuffer = nullptr, Buffer* indexBuffer = nullptr) override;
 };
 
 struct Model : Asset

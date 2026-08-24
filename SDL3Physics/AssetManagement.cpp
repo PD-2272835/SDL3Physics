@@ -62,7 +62,7 @@ std::shared_ptr<Asset> AssetManagement::LoadAsset(const std::string& AssetPath)
 
 bool AssetManagement::RegisterResource(const std::string& key, const std::shared_ptr<Asset> ref)
 {
-	//TODO: Finish asset bundles
+	//TODO: asset bundles
 	mAssets[key] = ref;
 	return false;
 }

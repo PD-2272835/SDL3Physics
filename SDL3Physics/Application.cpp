@@ -20,6 +20,8 @@ void Application::Init(SDL_GPUDevice* device, uint32_t width, uint32_t height, S
 	WindowWidth = width;
 	WindowHeight = height;
 	Window = window;
+
+	diffuseSampler = SDL_CreateGPUSampler(Device, &samplerInfo);
 }
 
 

@@ -82,9 +82,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 	
 	SDL_ClaimWindowForGPUDevice(device, window);
 
-	Shader vertexShader(device, "shaderSource/default_vert.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1, 0, 1);
-	Shader fragmentShader(device, "shaderSource/default_frag.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_FRAGMENT);
-	
+	//basic rendered shaders
+	Shader vertexShader(device, "shaderSource/textured_model_vert.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_VERTEX, 0, 1, 0, 1);
+	Shader fragmentShader(device, "shaderSource/textured_model_frag.spv", PLATFORM_TARGET_TYPE, SDL_GPU_SHADERSTAGE_FRAGMENT, 1, 0, 0, 0);
+
+
 	//describing the vertex buffers
 	SDL_GPUVertexBufferDescription vertexBufferDescriptions[1];
 	vertexBufferDescriptions[0].slot = 0;
@@ -143,7 +145,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 		//SDL_GPU_TEXTUREFORMAT_D32_FLOAT, SDL_GPU_TEXTURETYPE_2D, SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET) 
 		//? SDL_GPU_TEXTUREFORMAT_D32_FLOAT : SDL_GPU_TEXTUREFORMAT_D16_UNORM; //use float if supported
 
-	SDL_GPUTextureCreateInfo depthTexInfo = {};
+	SDL_GPUTextureCreateInfo depthTexInfo{};
 	depthTexInfo.format = depthFormat;
 	depthTexInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
 	depthTexInfo.width = Width;
